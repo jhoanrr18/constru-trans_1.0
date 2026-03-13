@@ -17,7 +17,15 @@ urlpatterns = [
     path("conductores/", views.lista_conductores, name="lista_conductores"),
     path("vehiculos/", views.lista_vehiculos, name="lista_vehiculos"),
     path("reportes/", views.reportes_admin, name="reportes_admin"),
+
     path("cliente/", views.panel_cliente, name="panel_cliente"),
+    path("perfil/", views.perfil_cliente, name="perfil_cliente"),
+
+    path("pedido/crear/", views.crear_pedido, name="crear_pedido"),
+    path("mis-pedidos/", views.mis_pedidos, name="mis_pedidos"),
+    path("seguimiento/", views.seguimiento_pedidos, name="seguimiento_pedidos"),
+    path("historial/", views.historial_pedidos, name="historial_pedidos"),
+
     path("materiales/", views.lista_materiales, name="lista_materiales"),
     path("materiales/crear/", views.crear_material, name="crear_material"),
     path("materiales/editar/<int:id>/", views.editar_material, name="editar_material"),

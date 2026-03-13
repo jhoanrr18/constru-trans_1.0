@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .models import Usuario, Vehiculo
+from .models import Usuario, Vehiculo, Material
 from Ordenes.models import Orden
 
 from django.contrib.auth.models import User
@@ -7,8 +7,6 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 
 from django.db.models import Sum
-
-from .models import Material
 
 
 # -------------------------
@@ -21,6 +19,10 @@ def registro(request):
         nombre = request.POST.get("nombre")
         email = request.POST.get("correo")
         telefono = request.POST.get("telefono")
+
+        tipo_documento = request.POST.get("tipo_documento")
+        documento = request.POST.get("documento")
+
         rol = request.POST.get("rol")
 
         password = request.POST.get("contrasena")
@@ -31,24 +33,31 @@ def registro(request):
                 "error": "Las contraseñas no coinciden"
             })
 
-        # Crear usuario de Django
+        if User.objects.filter(username=email).exists():
+            return render(request, "usuarios/registro.html", {
+                "error": "Este correo ya está registrado"
+            })
+
         user = User.objects.create_user(
-            username=email,   # usamos el correo como username
+            username=email,
             email=email,
             password=password
         )
 
-        # Crear usuario de tu modelo
         Usuario.objects.create(
             user=user,
             nombre=nombre,
             telefono=telefono,
-            rol=rol
+            rol=rol,
+            tipo_documento=tipo_documento,
+            documento=documento
         )
 
         return redirect("login")
 
     return render(request, "usuarios/registro.html")
+
+
 # -------------------------
 # LOGIN
 # -------------------------
@@ -62,8 +71,27 @@ def login_usuario(request):
         user = authenticate(request, username=username, password=password)
 
         if user is not None:
+
             login(request, user)
-            return redirect("panel")
+
+            usuario = user.usuario
+
+            if usuario.rol == "admin":
+                return redirect("panel")
+
+            elif usuario.rol == "cliente":
+                return redirect("panel_cliente")
+
+            elif usuario.rol == "conductor":
+                return redirect("panel")
+
+            elif usuario.rol == "empleado":
+                return redirect("panel")
+
+        else:
+            return render(request, "usuarios/login.html", {
+                "error": "Usuario o contraseña incorrectos"
+            })
 
     return render(request, "usuarios/login.html")
 
@@ -86,7 +114,9 @@ def panel(request):
         return render(request, "usuarios/panel-conductor.html")
 
     elif usuario.rol == "empleado":
-        return render(request, "usuarios/panel-sesion.html")
+        return render(request, "usuarios/panel-empleado.html")
+
+    return redirect("login")
 
 
 # -------------------------
@@ -200,7 +230,7 @@ def reportes_admin(request):
 @login_required
 def panel_cliente(request):
 
-    cliente = Usuario.objects.get(user=request.user)
+    cliente = request.user.usuario
 
     pedidos = Orden.objects.filter(cliente=cliente)
 
@@ -219,6 +249,7 @@ def panel_cliente(request):
     }
 
     return render(request, "Cliente/dashboard.html", context)
+
 
 # -------------------------
 # LISTA DE MATERIALES
@@ -292,3 +323,99 @@ def eliminar_material(request, id):
     material.delete()
 
     return redirect("lista_materiales")
+
+
+# -------------------------
+# PERFIL CLIENTE
+# -------------------------
+@login_required
+def perfil_cliente(request):
+
+    cliente = request.user.usuario
+
+    return render(request, "Cliente/perfil.html", {
+        "cliente": cliente
+    })
+
+
+# -------------------------
+# CREAR PEDIDO (CLIENTE)
+# -------------------------
+@login_required
+def crear_pedido(request):
+
+    cliente = request.user.usuario
+    materiales = Material.objects.all()
+
+    if request.method == "POST":
+
+        material_id = request.POST.get("material")
+        cantidad = request.POST.get("cantidad")
+        direccion = request.POST.get("direccion")
+
+        material = Material.objects.get(id=material_id)
+
+        total = material.precio * int(cantidad)
+
+        Orden.objects.create(
+            cliente=cliente,
+            material=material,
+            cantidad=cantidad,
+            direccion=direccion,
+            precio=total,
+            estado="pendiente"
+        )
+
+        return redirect("mis_pedidos")
+
+    return render(request, "Cliente/crear_pedido.html", {
+        "materiales": materiales
+    })
+
+
+# -------------------------
+# MIS PEDIDOS
+# -------------------------
+@login_required
+def mis_pedidos(request):
+
+    cliente = request.user.usuario
+
+    pedidos = Orden.objects.filter(cliente=cliente).order_by("-fecha")
+
+    return render(request, "Cliente/mis_pedidos.html", {
+        "pedidos": pedidos
+    })
+
+
+# -------------------------
+# SEGUIMIENTO PEDIDOS
+# -------------------------
+@login_required
+def seguimiento_pedidos(request):
+
+    cliente = request.user.usuario
+
+    pedidos = Orden.objects.filter(cliente=cliente).order_by("-fecha")
+
+    return render(request, "Cliente/seguimiento.html", {
+        "pedidos": pedidos
+    })
+
+
+# -------------------------
+# HISTORIAL PEDIDOS
+# -------------------------
+@login_required
+def historial_pedidos(request):
+
+    cliente = request.user.usuario
+
+    pedidos = Orden.objects.filter(
+        cliente=cliente,
+        estado="entregado"
+    ).order_by("-fecha")
+
+    return render(request, "Cliente/historial.html", {
+        "pedidos": pedidos
+    })
