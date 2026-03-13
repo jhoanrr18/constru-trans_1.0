@@ -30,7 +30,8 @@ INSTALLED_APPS = [
     'Usuarios',
     'Inventario',
     'Logistica',
-    'Ordenes'
+    'Ordenes',
+    'dashboard',
 
 ]
 
