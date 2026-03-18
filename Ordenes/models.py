@@ -1,22 +1,10 @@
 from django.db import models
-from usuarios.models import Usuario
+from usuarios.models import Usuario, Vehiculo
 
 
 class Orden(models.Model):
-
-    cliente = models.ForeignKey(
-        Usuario,
-        on_delete=models.CASCADE,
-        related_name="ordenes_cliente"
-    )
-
-    conductor = models.ForeignKey(
-        Usuario,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name="ordenes_conductor"
-    )
+    cliente = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name="ordenes_cliente")
+    conductor = models.ForeignKey(Usuario, on_delete=models.SET_NULL, null=True, blank=True, related_name="ordenes_conductor")
 
     direccion_origen = models.CharField(max_length=200)
     direccion_destino = models.CharField(max_length=200)
@@ -33,7 +21,17 @@ class Orden(models.Model):
         default="pendiente"
     )
 
+    precio = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+
     def __str__(self):
         return f"Orden {self.id} - {self.estado}"
-    
-    precio = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+
+
+class Entrega(models.Model):
+    pedido = models.ForeignKey(Orden, on_delete=models.CASCADE)
+    conductor = models.ForeignKey(Usuario, on_delete=models.CASCADE)
+    vehiculo = models.ForeignKey(Vehiculo, on_delete=models.CASCADE)
+    fecha = models.DateTimeField()
+
+    def __str__(self):
+        return f"Entrega de pedido {self.pedido.id}"
