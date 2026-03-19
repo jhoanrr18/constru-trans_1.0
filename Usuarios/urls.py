@@ -34,16 +34,16 @@ urlpatterns = [
     path("pedidos/", views.lista_pedidos_admin, name="lista_pedidos_admin"),
     path("vehiculos/crear/", views.crear_vehiculo, name="crear_vehiculo"),
 
-   # PANEL CONDUCTOR
+
 path("panel-conductor/", views.panel_conductor, name="panel_conductor"),
 path("perfil-conductor/", views.perfil_conductor, name="perfil_conductor"),
 
-# pedidos activos
+
 path("pedidos/", views.pedidos_conductor, name="pedidos_conductor"),
 
-# historial de entregas
+
 path("mis-entregas/", views.mis_entregas, name="mis_entregas"),
-    # RECUPERAR CONTRASEÑA
+
     path(
         "recuperar/",
         auth_views.PasswordResetView.as_view(
