@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import login_required
 
 from django.db.models import Sum
 from django.utils.timezone import now
+from django.shortcuts import get_object_or_404
 
 
 def registro(request):
@@ -209,7 +210,7 @@ def lista_usuarios(request):
 @login_required
 def eliminar_usuario(request, id):
 
-    usuario = Usuario.objects.get(id=id)
+    usuario = get_object_or_404 (usuario, id=id)
     usuario.delete()
 
     return redirect("lista_usuarios")
@@ -569,3 +570,14 @@ def crear_vehiculo(request):
         return redirect("lista_vehiculos")
 
     return render(request, "dashboard/vehiculo_crear.html")
+
+
+@login_required
+def eliminar_orden(request, id):
+    orden = get_object_or_404(Orden, id=id)
+
+    if request.method == "POST":
+        orden.delete()
+        return redirect("lista_pedidos_admin")
+
+    return redirect("lista_pedidos_admin")
