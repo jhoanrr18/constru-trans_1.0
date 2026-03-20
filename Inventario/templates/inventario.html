@@ -46,7 +46,7 @@ body { background-color: #D9D9D9; }
 <div class="container-fluid p-0">
 <div class="row g-0">
 
-<!-- SIDEBAR -->
+<!-- sidebar panel -->
 <nav class="col-auto sidebar color-oscuro-bg d-flex flex-column vh-100 sticky-top shadow">
 
     <div class="p-4 text-center border-bottom border-secondary mb-3">
@@ -66,7 +66,7 @@ body { background-color: #D9D9D9; }
 
 </nav>
 
-<!-- CONTENIDO -->
+<!-- el contenido -->
 <main class="col p-4">
 
 <h2>Inventario - Productos</h2>
@@ -87,7 +87,7 @@ body { background-color: #D9D9D9; }
     </div>
 </div>
 
-<!-- BUSCADOR -->
+<!-- el buscador del producto -->
 <form method="GET" class="mb-3">
     <input type="text" name="q" value="{{ request.GET.q }}" 
            class="form-control" placeholder="Buscar producto...">
@@ -98,7 +98,7 @@ body { background-color: #D9D9D9; }
     + Agregar Producto
 </button>
 
-<!-- FORMULARIO -->
+<!-- el formulario -->
 <form method="POST" class="card p-3 mb-3 d-none">
     {% csrf_token %}
 
@@ -111,7 +111,11 @@ body { background-color: #D9D9D9; }
     <button type="submit" class="btn btn-dorado">Guardar Producto</button>
 </form>
 
-<!-- TABLA -->
+
+
+
+
+<!--  tabla -->
 <div class="card p-3">
 <table class="table table-hover">
 <thead>
