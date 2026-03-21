@@ -306,6 +306,10 @@ def perfil_cliente(request):
     })
 
 
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from .models import Material, Orden
+
 @login_required
 def crear_pedido(request):
     cliente = request.user.usuario
@@ -316,6 +320,7 @@ def crear_pedido(request):
         cantidad = request.POST.get("cantidad")
         direccion = request.POST.get("direccion")
 
+<<<<<<< HEAD
         try:
             material = Material.objects.get(id=material_id)
             total = material.precio * int(cantidad)
@@ -331,6 +336,48 @@ def crear_pedido(request):
             print(f"ORDEN CREADA EXITOSAMENTE: ID {nueva_orden.id} para el cliente {cliente.nombre}")
             
             return redirect("mis_pedidos")
+=======
+        # 🔴 VALIDACIONES BÁSICAS
+        if not material_id or not cantidad or not direccion:
+            return render(request, "cliente/crear_pedido.html", {
+                "materiales": materiales,
+                "error": "Todos los campos son obligatorios"
+            })
+
+        try:
+            cantidad = int(cantidad)
+        except:
+            return render(request, "cliente/crear_pedido.html", {
+                "materiales": materiales,
+                "error": "Cantidad inválida"
+            })
+
+        try:
+            material = Material.objects.get(id=material_id)
+        except Material.DoesNotExist:
+            return render(request, "cliente/crear_pedido.html", {
+                "materiales": materiales,
+                "error": "Material no válido"
+            })
+
+        total = material.precio * cantidad
+
+        Orden.objects.create(
+            cliente=cliente,
+            material=material,
+            cantidad=cantidad,
+            direccion_origen="Bodega",
+            direccion_destino=direccion,
+            precio=total,
+            estado="pendiente"
+        )
+
+        return redirect("mis_pedidos")
+
+    return render(request, "cliente/crear_pedido.html", {
+        "materiales": materiales
+    })
+>>>>>>> origin/main
 
         except Exception as e:
             print(f"ERROR AL CREAR ORDEN: {e}") # Mira tu terminal de VS Code o CMD
