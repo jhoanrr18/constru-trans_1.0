@@ -54,7 +54,7 @@ def registro(request):
     return render(request, "usuarios/registro.html")
 
 
-@login_required
+
 def login_usuario(request):
 
     if request.method == "POST":
