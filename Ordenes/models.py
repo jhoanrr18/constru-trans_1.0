@@ -35,3 +35,9 @@ class Entrega(models.Model):
 
     def __str__(self):
         return f"Entrega de pedido {self.pedido.id}"
+    
+    
+class DetalleOrden(models.Model):
+    orden = models.ForeignKey(Orden, on_delete=models.CASCADE)
+    material = models.ForeignKey("usuarios.Material", on_delete=models.CASCADE)
+    cantidad = models.IntegerField()

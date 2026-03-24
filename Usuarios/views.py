@@ -6,6 +6,9 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 
+
+from ordenes.models import Orden, DetalleOrden
+
 from django.db.models import Sum
 from django.utils.timezone import now
 
@@ -316,14 +319,30 @@ def crear_pedido(request):
     if request.method == "POST":
 
         material_id = request.POST.get("material")
-        cantidad = int(request.POST.get("cantidad"))
+        cantidad = request.POST.get("cantidad")
         direccion = request.POST.get("direccion")
+
+        # 🔴 Validaciones básicas
+        if not material_id or not cantidad or not direccion:
+            messages.error(request, "Todos los campos son obligatorios")
+            return redirect("crear_pedido")
+
+        try:
+            cantidad = int(cantidad)
+        except:
+            messages.error(request, "Cantidad inválida")
+            return redirect("crear_pedido")
+
+        if cantidad <= 0:
+            messages.error(request, "Cantidad debe ser mayor a 0")
+            return redirect("crear_pedido")
 
         material = Material.objects.get(id=material_id)
 
         total = material.precio * cantidad
 
-        Orden.objects.create(
+        # Crear orden
+        orden = Orden.objects.create(
             cliente=cliente,
             direccion_origen="Bodega",
             direccion_destino=direccion,
@@ -331,6 +350,14 @@ def crear_pedido(request):
             estado="pendiente"
         )
 
+        # 🔥 GUARDAR MATERIAL (esto te faltaba)
+        DetalleOrden.objects.create(
+            orden=orden,
+            material=material,
+            cantidad=cantidad
+        )
+
+        messages.success(request, "Pedido creado correctamente")
         return redirect("mis_pedidos")
 
     return render(request, "cliente/crear_pedido.html", {
@@ -450,7 +477,6 @@ def crear_material(request):
 
 @login_required
 def editar_material(request, id):
-
     material = get_object_or_404(Material, id=id)
 
     if request.method == "POST":
@@ -459,8 +485,11 @@ def editar_material(request, id):
         tipo = request.POST.get("tipo")
         precio = request.POST.get("precio")
         stock = request.POST.get("stock")
-        
-    if not material.nombre or not material.precio or not material.stock or not tipo:
+
+        # Validar campos vacíos (los nuevos, no el material viejo)
+        if not nombre or not precio or not stock or not tipo:
+            messages.error(request, "Campos obligatorios")
+            return redirect("editar_material", id=id)
 
         try:
             precio = float(precio)
@@ -473,6 +502,7 @@ def editar_material(request, id):
             messages.error(request, "Valores negativos no permitidos")
             return redirect("editar_material", id=id)
 
+        # Actualizar
         material.nombre = nombre
         material.descripcion = descripcion
         material.tipo = tipo

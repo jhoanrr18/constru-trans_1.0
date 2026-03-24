@@ -73,7 +73,7 @@ class Vehiculo(models.Model):
 # -------------------------
 class Material(models.Model):
     nombre = models.CharField(max_length=100)
-    tipo = models.CharField(max_length=50)
+    tipo = models.CharField(max_length=50, null=True, blank=True)
     descripcion = models.TextField()
 
     precio = models.DecimalField(
@@ -91,3 +91,12 @@ class Material(models.Model):
             MaxValueValidator(100000)
         ]
     )
+    
+    
+    
+    
+    
+    
+    
+    
+    
