@@ -16,7 +16,7 @@ def registro(request):
 
     if request.method == "POST":
         nombre = request.POST.get("nombre")
-        email = request.POST.get("correo")
+        email = request.POST.get("correo").strip().lower()
         telefono = request.POST.get("telefono")
         tipo_documento = request.POST.get("tipo_documento")
         documento = request.POST.get("documento")
@@ -58,24 +58,30 @@ def registro(request):
 def login_usuario(request):
 
     if request.method == "POST":
-        username = request.POST.get("username")
+        username = request.POST.get("username").strip().lower()
         password = request.POST.get("password")
 
         user = authenticate(request, username=username, password=password)
 
+        # 🔥 DEBUG (aquí van los print)
+        print("USER:", username)
+        print("PASS:", password)
+        print("AUTH:", user)
+
         if user is not None:
             login(request, user)
 
-            usuario = user.usuario
+            if hasattr(user, "usuario"):
+                rol = user.usuario.rol
 
-            if usuario.rol == "admin":
-                return redirect("panel")
-            elif usuario.rol == "cliente":
-                return redirect("panel_cliente")
-            elif usuario.rol == "conductor":
-                return redirect("panel_conductor")
-            else:
-                return redirect("panel")
+                if rol == "admin":
+                    return redirect("panel")
+                elif rol == "cliente":
+                    return redirect("panel_cliente")
+                elif rol == "conductor":
+                    return redirect("panel_conductor")
+
+            return redirect("panel")
 
         else:
             return render(request, "usuarios/login.html", {
@@ -83,7 +89,6 @@ def login_usuario(request):
             })
 
     return render(request, "usuarios/login.html")
-
 
 # ---------------- PANEL ADMIN ----------------
 @login_required
