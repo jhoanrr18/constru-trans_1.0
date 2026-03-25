@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Asignar conductor Orden #{{ orden.id }}</h2>
+<form method="post">
+    {% csrf_token %}
+    <div class="mb-3">
+        <label class="form-label">Conductor</label>
+        <select name="conductor" class="form-control" required>
+            <option value="">-- Seleccionar --</option>
+            {% for c in conductores %}
+                <option value="{{ c.id }}" {% if orden.conductor and orden.conductor.id == c.id %}selected{% endif %}>{{ c.nombre }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <button type="submit" class="btn btn-success">Asignar</button>
+    <a href="{% url 'lista_ordenes' %}" class="btn btn-secondary">Cancelar</a>
+</form>
+{% endblock %}

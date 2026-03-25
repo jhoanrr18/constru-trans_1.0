@@ -41,3 +41,7 @@ class DetalleOrden(models.Model):
     orden = models.ForeignKey(Orden, on_delete=models.CASCADE, related_name="detalles")
     material = models.ForeignKey("usuarios.Material", on_delete=models.CASCADE)
     cantidad = models.IntegerField()
+
+    @property
+    def subtotal(self):
+        return self.material.precio * self.cantidad

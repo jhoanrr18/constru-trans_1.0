@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Detalle de Orden #{{ orden.id }}</h2>
+<div class="card">
+    <div class="card-body">
+        <p><strong>Cliente:</strong> {{ orden.cliente.nombre }}</p>
+        <p><strong>Conductor:</strong> {{ orden.conductor.nombre if orden.conductor else 'Sin conductor' }}</p>
+        <p><strong>Origen:</strong> {{ orden.direccion_origen }}</p>
+        <p><strong>Destino:</strong> {{ orden.direccion_destino }}</p>
+        <p><strong>Estado:</strong> {{ orden.estado }}</p>
+        <p><strong>Precio:</strong> ${{ orden.precio }}</p>
+        <a href="{% url 'lista_ordenes' %}" class="btn btn-secondary">Volver</a>
+    </div>
+</div>
+{% endblock %}

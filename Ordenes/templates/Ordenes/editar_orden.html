@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Editar Orden #{{ orden.id }}</h2>
+<form method="post">
+    {% csrf_token %}
+    <div class="mb-3">
+        <label class="form-label">Cliente</label>
+        <select name="cliente" class="form-control">
+            {% for c in clientes %}
+                <option value="{{ c.id }}" {% if c == orden.cliente %}selected{% endif %}>{{ c.nombre }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Conductor</label>
+        <select name="conductor" class="form-control">
+            <option value="">Sin conductor</option>
+            {% for c in conductores %}
+                <option value="{{ c.id }}" {% if orden.conductor and c == orden.conductor %}selected{% endif %}>{{ c.nombre }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Origen</label>
+        <input type="text" name="origen" class="form-control" value="{{ orden.direccion_origen }}">
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Destino</label>
+        <input type="text" name="destino" class="form-control" value="{{ orden.direccion_destino }}">
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Estado</label>
+        <select name="estado" class="form-control">
+            {% for est in estados %}
+                <option value="{{ est }}" {% if orden.estado == est %}selected{% endif %}>{{ est }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Guardar</button>
+    <a href="{% url 'lista_ordenes' %}" class="btn btn-secondary">Cancelar</a>
+</form>
+{% endblock %}

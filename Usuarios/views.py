@@ -1,7 +1,8 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from .models import *
 from ordenes.models import Orden
 
+from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -70,15 +71,21 @@ def login_usuario(request):
 
         if user is not None:
 
-            login(request, user)
+            try:
+                usuario = user.usuario
+            except Usuario.DoesNotExist:
+                return render(request, "usuarios/login.html", {
+                    "error": "El usuario no tiene perfil completo. Contacta al administrador."
+                })
 
-            usuario = user.usuario
+            login(request, user)
 
             if usuario.rol == "admin":
                 return redirect("panel")
 
             elif usuario.rol == "cliente":
                 return redirect("panel_cliente")
+
 
             elif usuario.rol == "conductor":
                 return redirect("panel_conductor")
@@ -97,7 +104,11 @@ def login_usuario(request):
 @login_required
 def panel(request):
 
-    usuario = request.user.usuario
+    try:
+        usuario = request.user.usuario
+    except Usuario.DoesNotExist:
+        messages.error(request, "Tu usuario no tiene perfil completo. Por favor cierra sesión e inicia sesión con un usuario de la lista.")
+        return redirect("login")
 
     if usuario.rol == "admin":
 
@@ -313,7 +324,12 @@ def perfil_cliente(request):
 @login_required
 def crear_pedido(request):
 
-    cliente = request.user.usuario
+    try:
+        cliente = request.user.usuario
+    except Usuario.DoesNotExist:
+        messages.error(request, "No se encontró el perfil de usuario. Por favor cierra sesión e inicia de nuevo.")
+        return redirect("login")
+
     materiales = Material.objects.all()
 
     if request.method == "POST":
@@ -322,14 +338,13 @@ def crear_pedido(request):
         cantidad = request.POST.get("cantidad")
         direccion = request.POST.get("direccion")
 
-        # 🔴 Validaciones básicas
         if not material_id or not cantidad or not direccion:
             messages.error(request, "Todos los campos son obligatorios")
             return redirect("crear_pedido")
 
         try:
             cantidad = int(cantidad)
-        except:
+        except ValueError:
             messages.error(request, "Cantidad inválida")
             return redirect("crear_pedido")
 
@@ -337,11 +352,14 @@ def crear_pedido(request):
             messages.error(request, "Cantidad debe ser mayor a 0")
             return redirect("crear_pedido")
 
-        material = Material.objects.get(id=material_id)
+        material = get_object_or_404(Material, pk=material_id)
+
+        if material.stock < cantidad:
+            messages.error(request, "No hay stock suficiente del material seleccionado")
+            return redirect("crear_pedido")
 
         total = material.precio * cantidad
 
-        # Crear orden
         orden = Orden.objects.create(
             cliente=cliente,
             direccion_origen="Bodega",
@@ -350,12 +368,14 @@ def crear_pedido(request):
             estado="pendiente"
         )
 
-        # 🔥 GUARDAR MATERIAL (esto te faltaba)
         DetalleOrden.objects.create(
             orden=orden,
             material=material,
             cantidad=cantidad
         )
+
+        material.stock -= cantidad
+        material.save()
 
         messages.success(request, "Pedido creado correctamente")
         return redirect("mis_pedidos")
@@ -368,11 +388,17 @@ def crear_pedido(request):
 @login_required
 def mis_pedidos(request):
 
-    cliente = request.user.usuario
+    try:
+        cliente = request.user.usuario
+    except Usuario.DoesNotExist:
+        messages.error(request, "No se encontró el perfil de usuario. Por favor cierra sesión e inicia de nuevo.")
+        return redirect("login")
 
-    pedidos = Orden.objects.filter(
-        cliente=cliente
-    ).order_by("-fecha")
+    try:
+        pedidos = Orden.objects.filter(cliente=cliente).order_by("-fecha")
+    except Exception:
+        messages.error(request, "Error al cargar tus pedidos. Intenta nuevamente más tarde.")
+        pedidos = Orden.objects.none()
 
     return render(request, "cliente/mis_pedidos.html", {
         "pedidos": pedidos

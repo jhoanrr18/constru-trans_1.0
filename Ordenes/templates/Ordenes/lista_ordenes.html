@@ -26,14 +26,24 @@
     <tr>
         <td>{{ orden.id }}</td>
         <td>{{ orden.cliente.nombre }}</td>
-        <td>{{ orden.conductor.nombre }}</td>
-        <td>{{ orden.origen }}</td>
-        <td>{{ orden.destino }}</td>
+        <td>
+            {% if orden.conductor %}
+                {{ orden.conductor.nombre }}
+            {% else %}
+                Sin conductor
+            {% endif %}
+        </td>
+        <td>{{ orden.direccion_origen }}</td>
+        <td>{{ orden.direccion_destino }}</td>
         <td>{{ orden.estado }}</td>
 
         <td>
-            <a href="{% url 'editar_orden' orden.id %}" class="btn btn-sm btn-primary">Editar</a>
-            <a href="{% url 'eliminar_orden' orden.id %}" class="btn btn-sm btn-danger">Eliminar</a>
+            <div class="btn-group" role="group" aria-label="Acciones orden" style="gap: 0.35rem;">
+                <a href="{% url 'ver_orden' orden.id %}" class="btn btn-sm btn-outline-primary" title="Ver">Ver</a>
+                <a href="{% url 'editar_orden' orden.id %}" class="btn btn-sm btn-outline-secondary" title="Editar">Editar</a>
+                <a href="{% url 'asignar_conductor' orden.id %}" class="btn btn-sm btn-outline-success" title="Asignar conductor">Asg. cond.</a>
+                <a href="{% url 'eliminar_orden' orden.id %}" class="btn btn-sm btn-outline-danger" title="Eliminar" onclick="return confirm('¿Seguro que deseas eliminar esta orden?');">Eliminar</a>
+            </div>
         </td>
 
     </tr>
