@@ -1,8 +1,8 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from .models import Orden, Entrega
-from usuarios.models import Usuario, Vehiculo
-from django.shortcuts import redirect
+from usuarios.models import Usuario, Vehiculo, Material
 
 
 # 📋 LISTAR ÓRDENES
@@ -82,9 +82,36 @@ def crear_entrega(request, orden_id):
         "conductores": conductores,
         "vehiculos": vehiculos
     })
-    return redirect("lista_ordenes")
-def editar_orden(request, orden_id):
-    pass #
 
+
+@login_required
+def editar_orden(request, orden_id):
+    orden = get_object_or_404(Orden, id=orden_id)
+    clientes = Usuario.objects.filter(rol="cliente")
+    conductores = Usuario.objects.filter(rol="conductor")
+
+    if request.method == "POST":
+        orden.cliente_id = request.POST.get("cliente") or orden.cliente_id
+        orden.conductor_id = request.POST.get("conductor") or None
+        orden.direccion_origen = request.POST.get("origen") or orden.direccion_origen
+        orden.direccion_destino = request.POST.get("destino") or orden.direccion_destino
+        orden.save()
+        messages.success(request, "Orden actualizada correctamente")
+        return redirect("lista_ordenes")
+
+    return render(request, "ordenes/editar_orden.html", {
+        "orden": orden,
+        "clientes": clientes,
+        "conductores": conductores
+    })
+
+
+@login_required
 def eliminar_orden(request, orden_id):
-    return redirect('lista_ordenes')
+    orden = get_object_or_404(Orden, id=orden_id)
+    if request.method == "POST":
+        orden.delete()
+        messages.success(request, "Orden eliminada correctamente")
+        return redirect("lista_ordenes")
+    
+    return render(request, "ordenes/confirmar_eliminar.html", {"orden": orden})

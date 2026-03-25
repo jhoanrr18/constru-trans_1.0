@@ -1,5 +1,7 @@
 from django.db import models
 from usuarios.models import Usuario, Vehiculo
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 
 class Orden(models.Model):
@@ -32,7 +34,7 @@ class Entrega(models.Model):
     conductor = models.ForeignKey(Usuario, on_delete=models.CASCADE)
     vehiculo = models.ForeignKey(Vehiculo, on_delete=models.CASCADE)
 
-    fecha = models.DateTimeField()
+    fecha = models.DateTimeField(auto_now_add=True)
 
     estado = models.CharField(
         max_length=20,
@@ -46,3 +48,13 @@ class Entrega(models.Model):
 
     def __str__(self):
         return f"Entrega de pedido {self.pedido.id}"
+
+
+@receiver(post_save, sender=Entrega)
+def actualizar_estado_orden(sender, instance, created, **kwargs):
+    if created:
+        pedido = instance.pedido
+        # Cambiar estado a EN_RUTA cuando se asigna una entrega
+        if pedido.estado == Orden.PENDIENTE:
+            pedido.estado = Orden.EN_RUTA
+            pedido.save()
