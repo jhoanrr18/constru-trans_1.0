@@ -2,11 +2,8 @@ from django.urls import path
 from . import views
 from django.contrib.auth import views as auth_views
 
-<<<<<<< HEAD:Usuarios/urls.py
 app_name = 'usuarios'
 
-=======
->>>>>>> 248401ded1cafc672837167d1905cb8dd0e13caa:usuarios/urls.py
 urlpatterns = [
 
     # auth
@@ -41,33 +38,21 @@ urlpatterns = [
     path("pedido/<int:id>/", views.ver_pedido_admin, name="ver_pedido_admin"),
 
     # materiales
-    path("materiales/", views.lista_materiales, name="lista_materiales"),
+    path("materiales/", views.materiales_lista, name="materiales_lista"),
+    path("materiales/api/", views.api_materiales, name="api_materiales"),
     path("materiales/crear/", views.crear_material, name="crear_material"),
     path("materiales/editar/<int:id>/", views.editar_material, name="editar_material"),
     path("materiales/eliminar/<int:id>/", views.eliminar_material, name="eliminar_material"),
 
-<<<<<<< HEAD:Usuarios/urls.py
-
-path("panel-conductor/", views.panel_conductor, name="panel_conductor"),
-path("perfil-conductor/", views.perfil_conductor, name="perfil_conductor"),
-
-
-path("pedidos/", views.pedidos_conductor, name="pedidos_conductor"),
-
-
-path("mis-entregas/", views.mis_entregas, name="mis_entregas"),
-
-=======
     # conductor
     path("panel-conductor/", views.panel_conductor, name="panel_conductor"),
     path("perfil-conductor/", views.perfil_conductor, name="perfil_conductor"),
     path("pedidos-conductor/", views.pedidos_conductor, name="pedidos_conductor"),
     path("mis-entregas/", views.mis_entregas, name="mis_entregas"),
-    
+
     path("orden/eliminar/<int:id>/", views.eliminar_orden, name="eliminar_orden"),
 
     # recuperar contraseña
->>>>>>> 248401ded1cafc672837167d1905cb8dd0e13caa:usuarios/urls.py
     path(
         "recuperar/",
         auth_views.PasswordResetView.as_view(
@@ -90,7 +75,7 @@ path("mis-entregas/", views.mis_entregas, name="mis_entregas"),
             template_name="usuarios/password_confirmar.html"
         ),
         name="password_reset_confirm"
-        ),
+    ),
 
     path(
         "recuperar/completo/",
@@ -99,6 +84,4 @@ path("mis-entregas/", views.mis_entregas, name="mis_entregas"),
         ),
         name="password_reset_complete"
     ),
-    
-    
 ]

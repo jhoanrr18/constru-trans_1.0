@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <link rel="shortcut icon" href="{% static 'img/Logo1.png' %}" type="image/x-icon">
+    <link rel="shortcut icon" href="{% static 'img/Logo1.jpeg' %}" type="image/x-icon">
     <link rel="stylesheet" href="{% static 'css/registroestilo.css' %}">
 </head>
 
@@ -25,6 +25,8 @@
 {% csrf_token %}
 
 <input type="text" name="nombre" placeholder="Nombre completo" required>
+
+<input type="text" name="usuario" placeholder="Nombre de usuario" required>
 
 <input type="email" name="correo" placeholder="Correo electrónico" required>
 

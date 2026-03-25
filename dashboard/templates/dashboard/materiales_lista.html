@@ -5,88 +5,185 @@
 {% block content %}
 
 <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
-
     <h4 class="mb-0">Gestión de Materiales</h4>
 
+    <!-- Buscador -->
     <form method="GET" class="d-flex">
         <input type="text" name="q" class="form-control me-2" 
                placeholder="Buscar..." value="{{ request.GET.q }}">
         <button type="submit" class="btn btn-outline-primary">Buscar</button>
     </form>
 
-    <a href="{% url 'crear_material' %}" class="btn btn-primary">
+    <!-- Botón para abrir modal de creación -->
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalMaterial" onclick="prepararCrear()">
         <i class="bi bi-plus-lg"></i> Nuevo Material
-    </a>
-
+    </button>
 </div>
-
 
 <div class="card shadow-sm">
+    <div class="card-body">
+        <table class="table table-hover">
+            <thead class="table-light">
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Descripción</th>
+                    <th>Tipo</th>
+                    <th>Precio</th>
+                    <th>Stock</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for material in materiales %}
+                <tr>
+                    <td>{{ material.id }}</td>
+                    <td>{{ material.nombre }}</td>
+                    <td>{{ material.descripcion }}</td>
+                    <td>{{ material.tipo }}</td>
+                    <td>$ {{ material.precio }}</td>
+                    <td>{{ material.stock }}</td>
+                    <td>
+                        <!-- Botón para abrir modal de edición -->
+                        <button class="btn btn-sm btn-warning" onclick="prepararEditar({{ material.id }})">
+                            <i class="bi bi-pencil"></i>
+                        </button>
 
-<div class="card-body">
-
-<table class="table table-hover">
-
-<thead class="table-light">
-
-<tr>
-<th>ID</th>
-<th>Nombre</th>
-<th>Descripción</th>
-<th>Tipo</th>
-<th>Precio</th>
-<th>Stock</th>
-<th>Acciones</th>
-</tr>
-
-</thead>
-
-<tbody>
-
-{% for material in materiales %}
-
-<tr>
-<td>{{ material.id }}</td>
-<td>{{ material.nombre }}</td>
-<td>{{ material.descripcion }}</td>
-<td>{{ material.get_tipo_display }}</td>
-<td>$ {{ material.precio }}</td>
-<td>{{ material.stock }}</td>
-
-<td>
-
-<a href="{% url 'editar_material' material.id %}" class="btn btn-sm btn-warning">
-<i class="bi bi-pencil"></i>
-</a>
-
-
-<form action="{% url 'eliminar_material' material.id %}" method="POST" class="d-inline">
-    {% csrf_token %}
-    <button type="submit" class="btn btn-sm btn-danger"
-        onclick="return confirm('¿Seguro que deseas eliminar este material?')">
-        <i class="bi bi-trash"></i>
-    </button>
-</form>
-
-
-</td>
-
-</tr>
-
-{% empty %}
-
-<tr>
-<td colspan="5" class="text-center">No hay materiales registrados</td>
-</tr>
-
-{% endfor %}
-
-</tbody>
-
-</table>
-
+                        <!-- Formulario de eliminación -->
+                        <form action="{% url 'usuarios:eliminar_material' material.id %}" method="POST" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-danger"
+                                onclick="return confirm('¿Seguro que deseas eliminar este material?')">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center">No hay materiales registrados</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 
+<!-- VENTANA EMERGENTE (MODAL) ÚNICA PARA CREAR Y EDITAR -->
+<div class="modal fade" id="modalMaterial" tabindex="-1" aria-labelledby="modalMaterialLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalMaterialLabel">Material</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="formMaterial">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <input type="hidden" id="material_id" name="id">
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Nombre</label>
+                        <input type="text" id="nombre" name="nombre" class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Tipo</label>
+                        <select id="tipo" name="tipo" class="form-select" required>
+                            <option value="">Seleccione tipo</option>
+                            <option value="cemento">Cemento</option>
+                            <option value="arena">Arena</option>
+                            <option value="grava">Grava</option>
+                            <option value="ladrillo">Ladrillo</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Descripción</label>
+                        <textarea id="descripcion" name="descripcion" class="form-control" rows="3"></textarea>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Precio</label>
+                            <input type="number" id="precio" name="precio" class="form-control" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Stock</label>
+                            <input type="number" id="stock" name="stock" class="form-control" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="submit" class="btn btn-primary" id="btnGuardar">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
+
+<script>
+    let modalInstance;
+    document.addEventListener('DOMContentLoaded', function() {
+        const modalElement = document.getElementById('modalMaterial');
+        if (modalElement) {
+            modalInstance = new bootstrap.Modal(modalElement);
+        }
+    });
+
+    const formMaterial = document.getElementById('formMaterial');
+
+    function prepararCrear() {
+        formMaterial.reset();
+        document.getElementById('material_id').value = '';
+        document.getElementById('modalMaterialLabel').innerText = 'Nuevo Material';
+        document.getElementById('btnGuardar').innerText = 'Crear Material';
+    }
+
+    function prepararEditar(id) {
+        document.getElementById('modalMaterialLabel').innerText = 'Editar Material';
+        document.getElementById('btnGuardar').innerText = 'Actualizar Material';
+        
+        fetch(`/usuarios/materiales/editar/${id}/`, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('material_id').value = data.id;
+            document.getElementById('nombre').value = data.nombre;
+            document.getElementById('tipo').value = data.tipo;
+            document.getElementById('descripcion').value = data.descripcion;
+            document.getElementById('precio').value = data.precio;
+            document.getElementById('stock').value = data.stock;
+            modalInstance.show();
+        })
+        .catch(error => alert('Error al cargar datos'));
+    }
+
+    formMaterial.onsubmit = function(e) {
+        e.preventDefault();
+        const id = document.getElementById('material_id').value;
+        const url = id ? `/usuarios/materiales/editar/${id}/` : '/usuarios/materiales/crear/';
+        const formData = new FormData(formMaterial);
+
+        fetch(url, {
+            method: 'POST',
+            body: formData,
+            headers: { 
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                location.reload(); 
+            } else {
+                alert('Error al guardar');
+            }
+        });
+    }
+</script>
 
 {% endblock %}

@@ -20,9 +20,9 @@ INSTALLED_APPS = [
     'inventario',
     'logistica',
     'ordenes',
-    'dashboard',
     'inicio',
 ]
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -42,6 +42,7 @@ TEMPLATES = [
         'DIRS': [
             BASE_DIR / 'templates',
             BASE_DIR / 'cliente' / 'templates',
+            BASE_DIR / 'dashboard' / 'templates',
         ],
         'APP_DIRS': True,
         'OPTIONS': {

@@ -1,11 +1,16 @@
+{% load static %}
 <!DOCTYPE html>
 <html>
 <head>
     <title>Inicio de sesión</title>
+    <link rel="shortcut icon" href="{% static 'img/Logo1.jpeg' %}" type="image/x-icon">
 </head>
 <body>
 
-<h2>Iniciar sesión</h2>
+<div style="text-align: center; margin-top: 20px;">
+    <img src="{% static 'img/Logo1.jpeg' %}" width="200" alt="Logo">
+    <h2>Iniciar sesión</h2>
+</div>
 
 <form method="POST">
     {% csrf_token %}
@@ -23,7 +28,7 @@
     <button type="submit">Ingresar</button>
 </form>
 
-<a href="/">Volver al inicio</a>
+<a href="{% url 'inicio' %}">Volver al inicio</a>
 
 </body>
 </html>

@@ -1,5 +1,5 @@
 from django.db import models
-from usuarios.models import Usuario, Vehiculo
+from usuarios.models import Usuario, Vehiculo, Material
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
@@ -17,6 +17,13 @@ class Orden(models.Model):
         blank=True,
         related_name="ordenes_conductor"
     )
+    material = models.ForeignKey(
+        Material,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True
+    )
+    cantidad = models.IntegerField(default=1)
 
     direccion_origen = models.CharField(max_length=200)
     direccion_destino = models.CharField(max_length=200)
