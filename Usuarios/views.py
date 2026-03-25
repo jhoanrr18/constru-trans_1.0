@@ -420,6 +420,9 @@ def lista_materiales(request):
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
+from django.http import JsonResponse, HttpResponseBadRequest, HttpResponseForbidden
+from django.views.decorators.http import require_http_methods
+import json
 
 @login_required
 def crear_material(request):
@@ -430,33 +433,30 @@ def crear_material(request):
         tipo = request.POST.get("tipo")
         precio = request.POST.get("precio")
         stock = request.POST.get("stock")
-        
-        
-        
+
         if not nombre or not precio or not stock or not tipo:
             messages.error(request, "Campos obligatorios vacíos")
             return redirect("crear_material")
 
-        
-        
-
-       
-        if not nombre or not precio or not stock:
-            messages.error(request, "Campos obligatorios vacíos")
+        if Material.objects.filter(nombre__iexact=nombre).exists():
+            messages.error(request, "Ya existe un material con ese nombre")
             return redirect("crear_material")
 
         try:
             precio = float(precio)
             stock = int(stock)
-        except:
+        except ValueError:
             messages.error(request, "Precio y stock deben ser numéricos")
             return redirect("crear_material")
 
-        if precio < 0 or stock < 0:
-            messages.error(request, "No se permiten valores negativos")
+        if precio <= 0:
+            messages.error(request, "El precio debe ser mayor a 0")
             return redirect("crear_material")
 
-       
+        if stock < 0:
+            messages.error(request, "El stock no puede ser negativo")
+            return redirect("crear_material")
+
         material = Material(
             nombre=nombre,
             descripcion=descripcion,
@@ -471,12 +471,25 @@ def crear_material(request):
         messages.success(request, "Material creado correctamente")
         return redirect("lista_materiales")
 
-    
     return render(request, "dashboard/material_crear.html")
     
 
 @login_required
 def editar_material(request, id):
+    usuario = None
+    try:
+        usuario = request.user.usuario
+    except Exception:
+        pass
+
+    if not (
+        request.user.is_superuser
+        or request.user.is_staff
+        or (usuario and usuario.rol == "admin")
+    ):
+        messages.error(request, "No tienes permisos para realizar esta acción")
+        return redirect("lista_materiales")
+
     material = get_object_or_404(Material, id=id)
 
     if request.method == "POST":
@@ -486,20 +499,29 @@ def editar_material(request, id):
         precio = request.POST.get("precio")
         stock = request.POST.get("stock")
 
-        # Validar campos vacíos (los nuevos, no el material viejo)
+        # Validar campos obligatorios
         if not nombre or not precio or not stock or not tipo:
-            messages.error(request, "Campos obligatorios")
+            messages.error(request, "Todos los campos son obligatorios")
             return redirect("editar_material", id=id)
 
         try:
             precio = float(precio)
             stock = int(stock)
-        except:
-            messages.error(request, "Datos inválidos")
+        except ValueError:
+            messages.error(request, "Precio y stock deben ser números válidos")
             return redirect("editar_material", id=id)
 
-        if precio < 0 or stock < 0:
-            messages.error(request, "Valores negativos no permitidos")
+        if precio <= 0:
+            messages.error(request, "El precio debe ser mayor a 0")
+            return redirect("editar_material", id=id)
+
+        if stock < 0:
+            messages.error(request, "El stock no puede ser negativo")
+            return redirect("editar_material", id=id)
+
+        # Validar nombre duplicado
+        if Material.objects.filter(nombre__iexact=nombre).exclude(id=id).exists():
+            messages.error(request, "Ya existe un material con ese nombre")
             return redirect("editar_material", id=id)
 
         # Actualizar
@@ -511,12 +533,86 @@ def editar_material(request, id):
 
         material.save()
 
-        messages.success(request, "Material actualizado")
+        messages.success(request, "Material actualizado correctamente")
         return redirect("lista_materiales")
 
     return render(request, "dashboard/material_editar.html", {
         "material": material
     })
+
+
+@login_required
+@require_http_methods(["PATCH"])
+def api_actualizar_material(request, id):
+    if not request.user.is_authenticated:
+        return JsonResponse({"error": "No autenticado"}, status=401)
+
+    if not hasattr(request.user, "usuario"):
+        return JsonResponse({"error": "Perfil de usuario no encontrado"}, status=403)
+
+    usuario = request.user.usuario
+    if not (request.user.is_superuser or request.user.is_staff or usuario.rol == "admin"):
+        return JsonResponse({"error": "No tienes permisos para realizar esta acción"}, status=403)
+
+    material = get_object_or_404(Material, id=id)
+
+    if request.content_type == "application/json":
+        try:
+            data = json.loads(request.body.decode("utf-8"))
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "JSON inválido"}, status=400)
+    else:
+        data = request.POST.dict()
+
+    if not data:
+        return JsonResponse({"error": "Al menos un campo debe ser enviado"}, status=400)
+
+    campos_permitidos = {"nombre", "descripcion", "tipo", "precio", "stock"}
+    campos_invalidos = [field for field in data.keys() if field not in campos_permitidos]
+    if campos_invalidos:
+        return JsonResponse({"error": f"Campos no permitidos: {', '.join(campos_invalidos)}"}, status=400)
+
+    if "nombre" in data:
+        nombre = (data.get("nombre") or "").strip()
+        if not nombre:
+            return JsonResponse({"error": "El nombre no puede estar vacío"}, status=400)
+        if Material.objects.filter(nombre__iexact=nombre).exclude(id=id).exists():
+            return JsonResponse({"error": "Ya existe un material con ese nombre"}, status=400)
+        material.nombre = nombre
+
+    if "descripcion" in data:
+        material.descripcion = data.get("descripcion", "")
+
+    if "tipo" in data:
+        material.tipo = data.get("tipo", "")
+
+    if "precio" in data:
+        precio = data.get("precio")
+        try:
+            precio = float(precio)
+        except (ValueError, TypeError):
+            return JsonResponse({"error": "Precio debe ser numérico"}, status=400)
+        if precio <= 0:
+            return JsonResponse({"error": "El precio debe ser mayor a 0"}, status=400)
+        material.precio = precio
+
+    if "stock" in data:
+        stock = data.get("stock")
+        try:
+            stock = int(stock)
+        except (ValueError, TypeError):
+            return JsonResponse({"error": "Stock debe ser numérico"}, status=400)
+        if stock < 0:
+            return JsonResponse({"error": "El stock no puede ser negativo"}, status=400)
+        material.stock = stock
+
+    try:
+        material.full_clean()
+        material.save()
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=400)
+
+    return JsonResponse({"success": True, "mensaje": "Material actualizado correctamente"}, status=200)
 
 
 @login_required

@@ -38,6 +38,6 @@ class Entrega(models.Model):
     
     
 class DetalleOrden(models.Model):
-    orden = models.ForeignKey(Orden, on_delete=models.CASCADE)
+    orden = models.ForeignKey(Orden, on_delete=models.CASCADE, related_name="detalles")
     material = models.ForeignKey("usuarios.Material", on_delete=models.CASCADE)
     cantidad = models.IntegerField()
