@@ -13,7 +13,7 @@ from django.core.paginator import Paginator
 from django.db.models import Q
 
 
-<<<<<<< HEAD:Usuarios/views.py
+
 # =========================
 # LISTA DE USUARIOS (ADMIN)
 # =========================
@@ -26,9 +26,6 @@ def lista_usuarios(request):
 # =========================
 # REGISTRO
 # =========================
-=======
-# ---------------- REGISTRO ----------------
->>>>>>> 248401ded1cafc672837167d1905cb8dd0e13caa:usuarios/views.py
 def registro(request):
 
     if request.method == "POST":
@@ -71,13 +68,11 @@ def registro(request):
     return render(request, "usuarios/registro.html")
 
 
-<<<<<<< HEAD:Usuarios/views.py
+
 # =========================
 # LOGIN
 # =========================
-=======
 
->>>>>>> 248401ded1cafc672837167d1905cb8dd0e13caa:usuarios/views.py
 def login_usuario(request):
 
     if request.method == "POST":
@@ -86,14 +81,9 @@ def login_usuario(request):
 
         user = authenticate(request, username=username, password=password)
 
-        # 🔥 DEBUG (aquí van los print)
-        print("USER:", username)
-        print("PASS:", password)
-        print("AUTH:", user)
-
         if user is not None:
             login(request, user)
-<<<<<<< HEAD:Usuarios/views.py
+
             usuario = user.usuario
 
             if usuario.rol == "admin":
@@ -107,7 +97,6 @@ def login_usuario(request):
 
             elif usuario.rol == "empleado":
                 return redirect("usuarios:panel")
-=======
 
             if hasattr(user, "usuario"):
                 rol = user.usuario.rol
@@ -120,7 +109,7 @@ def login_usuario(request):
                     return redirect("panel_conductor")
 
             return redirect("panel")
->>>>>>> 248401ded1cafc672837167d1905cb8dd0e13caa:usuarios/views.py
+
 
         else:
             return render(request, "usuarios/login.html", {
@@ -129,14 +118,11 @@ def login_usuario(request):
 
     return render(request, "usuarios/login.html")
 
-<<<<<<< HEAD:Usuarios/views.py
+
 
 # =========================
 # PANEL ADMIN
-# =========================
-=======
-# ---------------- PANEL ADMIN ----------------
->>>>>>> 248401ded1cafc672837167d1905cb8dd0e13caa:usuarios/views.py
+# =======================
 @login_required
 def panel(request):
 
@@ -157,7 +143,7 @@ def panel(request):
 
         return render(request, "dashboard/panel-admin.html", context)
 
-<<<<<<< HEAD:Usuarios/views.py
+
     elif usuario.rol == "cliente":
         return redirect("usuarios:panel_cliente")
 
@@ -182,7 +168,7 @@ def panel_conductor(request):
 # =========================
 # PANEL CLIENTE
 # =========================
-=======
+
     return redirect("login")
 
 
@@ -225,7 +211,6 @@ def mis_entregas(request):
 
 
 # ---------------- CLIENTE ----------------
->>>>>>> 248401ded1cafc672837167d1905cb8dd0e13caa:usuarios/views.py
 @login_required
 def panel_cliente(request):
 
@@ -233,10 +218,9 @@ def panel_cliente(request):
     pedidos = Orden.objects.filter(cliente=cliente)
 
     context = {
-<<<<<<< HEAD:Usuarios/views.py
+
         "pedidos": pedidos,
-=======
->>>>>>> 248401ded1cafc672837167d1905cb8dd0e13caa:usuarios/views.py
+
         "pedidos_activos": pedidos.filter(estado="pendiente").count(),
         "entregadas": pedidos.filter(estado="entregado").count(),
         "total_gastado": pedidos.aggregate(total=Sum("precio"))["total"] or 0,
@@ -266,7 +250,7 @@ def eliminar_usuario(request, id):
 
 
 @login_required
-<<<<<<< HEAD:Usuarios/views.py
+
 def editar_usuario(request, id):
     usuario = get_object_or_404(Usuario, id=id)
 
@@ -278,7 +262,6 @@ def editar_usuario(request, id):
 
     return render(request, "usuarios/editar_usuario.html", {"usuario": usuario})
 
-=======
 def crear_pedido(request):
     cliente = request.user.usuario
     materiales = Material.objects.all()
@@ -302,7 +285,6 @@ def crear_pedido(request):
                 "materiales": materiales,
                 "error": "Datos inválidos"
             })
->>>>>>> 248401ded1cafc672837167d1905cb8dd0e13caa:usuarios/views.py
 
 # =========================
 # CONDUCTORES / VEHICULOS
@@ -312,7 +294,7 @@ def lista_conductores(request):
     conductores = Usuario.objects.filter(rol="conductor")
     return render(request, "usuarios/conductores.html", {"conductores": conductores})
 
-<<<<<<< HEAD:Usuarios/views.py
+
 
 @login_required
 def lista_vehiculos(request):
@@ -329,16 +311,6 @@ def crear_vehiculo(request):
             tipo=request.POST.get("tipo"),
             capacidad=request.POST.get("capacidad"),
             estado=request.POST.get("estado"),
-=======
-        Orden.objects.create(
-            cliente=cliente,
-            material=material,
-            cantidad=cantidad,
-            direccion_origen="Bodega",
-            direccion_destino=direccion,
-            precio=total,
-            estado="pendiente"
->>>>>>> 248401ded1cafc672837167d1905cb8dd0e13caa:usuarios/views.py
         )
         return redirect("usuarios:lista_vehiculos")
 
@@ -385,9 +357,9 @@ def crear_pedido(request):
 
 @login_required
 def mis_pedidos(request):
-<<<<<<< HEAD:Usuarios/views.py
+
     return render(request, "usuarios/mis_pedidos.html")
-=======
+
     cliente = request.user.usuario
 
     pedidos = Orden.objects.filter(
@@ -397,12 +369,12 @@ def mis_pedidos(request):
     return render(request, "cliente/mis_pedidos.html", {
         "pedidos": pedidos
     })
->>>>>>> 248401ded1cafc672837167d1905cb8dd0e13caa:usuarios/views.py
+
 
 
 # ---------------- ADMIN EXTRA ----------------
 @login_required
-<<<<<<< HEAD:Usuarios/views.py
+
 def seguimiento_pedidos(request):
     return render(request, "usuarios/seguimiento.html")
 
@@ -410,7 +382,7 @@ def seguimiento_pedidos(request):
 @login_required
 def historial_pedidos(request):
     return render(request, "usuarios/historial.html")
-=======
+
 def lista_vehiculos(request):
     vehiculos = Vehiculo.objects.all()
     return render(request, "dashboard/vehiculos_lista.html", {
@@ -474,7 +446,7 @@ def lista_usuarios(request):
         "usuarios": usuarios,
         "query": query
     })
->>>>>>> 248401ded1cafc672837167d1905cb8dd0e13caa:usuarios/views.py
+
 
 @login_required
 def eliminar_usuario(request, id):
@@ -503,10 +475,10 @@ def editar_usuario(request, id):
 @login_required
 def lista_materiales(request):
     materiales = Material.objects.all()
-<<<<<<< HEAD:Usuarios/views.py
+
     return render(request, "usuarios/materiales.html", {"materiales": materiales})
 
-=======
+
     return render(request, "dashboard/materiales_lista.html", {
         "materiales": materiales
     })
@@ -597,12 +569,12 @@ def lista_vehiculos(request):
     })
     
     # ---------------- GESTIÓN DE MATERIALES (FALTANTES) ----------------
->>>>>>> 248401ded1cafc672837167d1905cb8dd0e13caa:usuarios/views.py
+
 
 @login_required
 def crear_material(request):
     if request.method == "POST":
-<<<<<<< HEAD:Usuarios/views.py
+
         Material.objects.create(
             nombre=request.POST.get("nombre"),
             tipo=request.POST.get("tipo"),
@@ -610,74 +582,48 @@ def crear_material(request):
             precio=request.POST.get("precio"),
             stock=request.POST.get("stock"),
         )
+        messages.success(request, "Material creado correctamente")
         return redirect("usuarios:lista_materiales")
 
     return render(request, "usuarios/crear_material.html")
 
-=======
-        nombre = request.POST.get("nombre")
-        descripcion = request.POST.get("descripcion")
-        tipo = request.POST.get("tipo")
-        precio = request.POST.get("precio")
-        stock = request.POST.get("stock")
-
-        Material.objects.create(
-            nombre=nombre,
-            descripcion=descripcion,
-            tipo=tipo,
-            precio=precio,
-            stock=stock
-        )
-        messages.success(request, "Material creado correctamente")
-        return redirect("lista_materiales")
-
-    return render(request, "dashboard/material_crear.html")
->>>>>>> 248401ded1cafc672837167d1905cb8dd0e13caa:usuarios/views.py
 
 @login_required
 def editar_material(request, id):
     material = get_object_or_404(Material, id=id)
     if request.method == "POST":
         material.nombre = request.POST.get("nombre")
-<<<<<<< HEAD:Usuarios/views.py
-        material.precio = request.POST.get("precio")
-        material.stock = request.POST.get("stock")
-        material.save()
-        return redirect("usuarios:lista_materiales")
-
-    return render(request, "usuarios/editar_material.html", {"material": material})
-=======
         material.descripcion = request.POST.get("descripcion")
         material.tipo = request.POST.get("tipo")
         material.precio = request.POST.get("precio")
         material.stock = request.POST.get("stock")
         material.save()
         messages.success(request, "Material actualizado")
-        return redirect("lista_materiales")
+        return redirect("usuarios:lista_materiales")
 
-    return render(request, "dashboard/material_editar.html", {"material": material})
->>>>>>> 248401ded1cafc672837167d1905cb8dd0e13caa:usuarios/views.py
+    return render(request, "usuarios/editar_material.html", {"material": material})
+
 
 # ---------------- CONDUCTORES Y REPORTES ----------------
 
 @login_required
-<<<<<<< HEAD:Usuarios/views.py
+
 def eliminar_material(request, id):
     material = get_object_or_404(Material, id=id)
     material.delete()
     return redirect("usuarios:lista_materiales")
 
-=======
+
 def lista_conductores(request):
     conductores = Usuario.objects.filter(rol="conductor")
     return render(request, "dashboard/conductores_lista.html", {"conductores": conductores})
->>>>>>> 248401ded1cafc672837167d1905cb8dd0e13caa:usuarios/views.py
+
 
 # =========================
 # PERFILES
 # =========================
 @login_required
-<<<<<<< HEAD:Usuarios/views.py
+
 def perfil_cliente(request):
     return render(request, "usuarios/perfil_cliente.html", {
         "usuario": request.user.usuario
@@ -703,7 +649,7 @@ def reportes_admin(request):
     }
 
     return render(request, "usuarios/reportes.html", context)
-=======
+
 def reportes_admin(request):
     context = {
         "total": Orden.objects.count(),
@@ -712,4 +658,4 @@ def reportes_admin(request):
         "entregadas": Orden.objects.filter(estado="entregado").count(),
     }
     return render(request, "dashboard/reportes.html", context)
->>>>>>> 248401ded1cafc672837167d1905cb8dd0e13caa:usuarios/views.py
+

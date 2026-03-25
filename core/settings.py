@@ -22,6 +22,11 @@ INSTALLED_APPS = [
     'ordenes',
     'dashboard',
     'inicio',
+    'compras_proveedores',
+    'facturacion_pagos',
+    'transporte',
+    'reportes',
+    'cliente',
 ]
 
 MIDDLEWARE = [

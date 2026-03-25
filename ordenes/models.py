@@ -88,5 +88,7 @@ class Entrega(models.Model):
 def actualizar_estado_orden(sender, instance, created, **kwargs):
     if created:
         pedido = instance.pedido
-        pedido.estado = Orden.ENTREGADO
-        pedido.save()
+        # Cambiar estado a EN_RUTA cuando se asigna una entrega
+        if pedido.estado == Orden.PENDIENTE:
+            pedido.estado = Orden.EN_RUTA
+            pedido.save()

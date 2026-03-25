@@ -1,8 +1,7 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import Orden, Entrega
-from usuarios.models import Usuario, Vehiculo
-from django.shortcuts import redirect
+from usuarios.models import Usuario, Vehiculo, Material
 
 
 # 📋 LISTAR ÓRDENES
@@ -27,12 +26,7 @@ def crear_orden(request):
         cantidad_str = request.POST.get("cantidad")
         direccion = request.POST.get("direccion")
 
-        # LOG de depuración (Mira tu terminal negra donde corre el server)
-        print(f"--- INTENTO DE ORDEN ---")
-        print(f"ID Material: {material_id} | Cantidad: {cantidad_str} | Dirección: {direccion}")
-
         if not material_id or not cantidad_str or not direccion:
-            print("ERROR: Faltan campos en el formulario")
             return render(request, "cliente/crear_pedido.html", {
                 "materiales": materiales,
                 "error": "Por favor, completa todos los campos."
@@ -55,12 +49,10 @@ def crear_orden(request):
                 estado="pendiente"
             )
             
-            print(f"ÉXITO: Orden #{nueva_orden.id} creada correctamente.")
             return redirect("mis_pedidos")
 
         except Exception as e:
             # Si el código llega aquí, imprime el error real (ej: campo no existe)
-            print(f"ERROR CRÍTICO AL GUARDAR: {e}")
             return render(request, "cliente/crear_pedido.html", {
                 "materiales": materiales,
                 "error": f"Error interno: {e}"
