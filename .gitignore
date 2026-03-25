@@ -1,31 +1,60 @@
-# Django
-*.log
-local_settings.py
-db.sqlite3
-db.sqlite3-journal
-media
-db.sqlite3
+# --- Base de Datos (Crucial para evitar los conflictos que tenías) ---
+*.sqlite3
+*.sqlite3-journal
 
-# Django Migrations
-**/migrations/*.py
-!**/migrations/__init__.py
-
-# Assets
-node_modules/
-
-
-# Environments
-.env
-.venv
+# --- Entornos Virtuales y Dependencias ---
+.venv/
 env/
 venv/
 ENV/
 env.bak/
 venv.bak/
+node_modules/
+bin/
+include/
+lib/
+share/
 
-# Python
-*.pyc
+# --- Archivos de Configuración Sensibles (Seguridad) ---
+.env
+local_settings.py
+secrets.json
+
+# --- Archivos Temporales de Python ---
 __pycache__/
-*.pyo
-*.pyd
+*.py[cod]
+*$py.class
+*.so
 .Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+
+# --- Migraciones (Recomendado para evitar el error HEAD que sufriste) ---
+# Mantenemos los __init__.py pero ignoramos los archivos numerados
+**/migrations/*.py
+!**/migrations/__init__.py
+
+# --- Archivos de Medios y Logs ---
+media/
+static_collected/
+staticfiles/
+*.log
+
+# --- Archivos de Sistema y Editores (VS Code / Windows) ---
+.vscode/
+.idea/
+*.swp
+*.bak
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
