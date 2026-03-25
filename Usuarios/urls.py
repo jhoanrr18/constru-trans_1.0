@@ -39,7 +39,7 @@ path("panel-conductor/", views.panel_conductor, name="panel_conductor"),
 path("perfil-conductor/", views.perfil_conductor, name="perfil_conductor"),
 
 # pedidos activos
-path("pedidos/", views.pedidos_conductor, name="pedidos_conductor"),
+path("mis-pedidos-activos/", views.pedidos_conductor, name="pedidos_conductor"),
 
 # historial de entregas
 path("mis-entregas/", views.mis_entregas, name="mis_entregas"),
