@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, reverse_lazy
 from . import views
 from django.contrib.auth import views as auth_views
 
@@ -54,7 +54,10 @@ urlpatterns = [
     path(
         "recuperar/",
         auth_views.PasswordResetView.as_view(
-            template_name="usuarios/recuperar_password.html"
+            template_name="usuarios/password_reset/form.html",
+            success_url=reverse_lazy('usuarios:password_reset_done'),
+            email_template_name="usuarios/password_reset/email.html",
+            subject_template_name="usuarios/password_reset/subject.txt"
         ),
         name="password_reset"
     ),
@@ -62,7 +65,7 @@ urlpatterns = [
     path(
         "recuperar/enviado/",
         auth_views.PasswordResetDoneView.as_view(
-            template_name="usuarios/password_enviado.html"
+            template_name="usuarios/password_reset/done.html"
         ),
         name="password_reset_done"
     ),
@@ -70,7 +73,8 @@ urlpatterns = [
     path(
         "recuperar/<uidb64>/<token>/",
         auth_views.PasswordResetConfirmView.as_view(
-            template_name="usuarios/password_confirmar.html"
+            template_name="usuarios/password_reset/confirm.html",
+            success_url=reverse_lazy('usuarios:password_reset_complete')
         ),
         name="password_reset_confirm"
     ),
@@ -78,7 +82,7 @@ urlpatterns = [
     path(
         "recuperar/completo/",
         auth_views.PasswordResetCompleteView.as_view(
-            template_name="usuarios/password_completo.html"
+            template_name="usuarios/password_reset/complete.html"
         ),
         name="password_reset_complete"
     ),

@@ -1,0 +1,8 @@
+Se ha solicitado un restablecimiento de contraseña para tu cuenta en Constru-Trans.
+Por favor, ve a la siguiente página y elige una nueva contraseña:
+
+{{ protocol }}://{{ domain }}{% url 'usuarios:password_reset_confirm' uidb64=uid token=token %}
+
+Tu nombre de usuario, en caso de que lo hayas olvidado: {{ user.get_username }}
+
+Si no has solicitado esto, puedes ignorar este mensaje.

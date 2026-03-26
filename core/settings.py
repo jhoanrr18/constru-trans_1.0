@@ -93,7 +93,14 @@ STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
 
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+# Configuración de correo electrónico (Gmail)
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'tu-correo@gmail.com'  # <-- Pon tu correo aquí
+EMAIL_HOST_PASSWORD = 'tu-contraseña-de-aplicacion'  # <-- Pon tu contraseña de aplicación aquí
+DEFAULT_FROM_EMAIL = 'Constru-Trans <tu-correo@gmail.com>'
 
 LOGIN_URL = '/usuarios/login/'
 LOGIN_REDIRECT_URL = '/usuarios/panel/'

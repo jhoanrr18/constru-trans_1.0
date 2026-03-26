@@ -1,0 +1,22 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <link rel="shortcut icon" href="{% static 'img/Logo1.jpeg' %}" type="image/x-icon">
+    <title>Contraseña Restablecida</title>
+    <link rel="stylesheet" href="{% static 'css/loginestilos.css' %}">
+</head>
+<body>
+    <div class="card">
+        <img src="{% static 'img/Logo1.jpeg' %}" width="200" style="display:block;margin:auto;margin-bottom:10px;">
+        <h2>¡Contraseña lista!</h2>
+        <p style="text-align:center; color:#57606f; margin-bottom:20px;">
+            Tu contraseña ha sido restablecida con éxito. Ya puedes iniciar sesión con tu nueva contraseña.
+        </p>
+        <div class="links">
+            <p><a href="{% url 'usuarios:login' %}">Iniciar sesión</a></p>
+        </div>
+    </div>
+</body>
+</html>
