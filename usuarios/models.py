@@ -105,7 +105,7 @@ class Orden(models.Model):
     direccion_destino = models.CharField(max_length=255)
     precio = models.DecimalField(max_digits=10, decimal_places=2)
     estado = models.CharField(max_length=50, default='pendiente')
-    fecha = models.DateTimeField(auto_now_add=True, null=True)
+    fecha = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ["-fecha"]
