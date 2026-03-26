@@ -91,6 +91,11 @@ class Material(models.Model):
             MaxValueValidator(100000)
         ]
     )
+
+    activo = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.nombre
     
     
     

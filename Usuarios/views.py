@@ -437,7 +437,7 @@ def historial_pedidos(request):
 @login_required
 def lista_materiales(request):
 
-    materiales = Material.objects.all()
+    materiales = Material.objects.all().order_by('-activo', 'nombre')  # Activos primero
 
     return render(request, "dashboard/materiales_lista.html", {
         "materiales": materiales
@@ -647,8 +647,10 @@ def eliminar_material(request, id):
     material = get_object_or_404(Material, id=id)
 
     if request.method == "POST":
-        material.delete()
-        messages.success(request, "Material eliminado correctamente")
+        material.activo = not material.activo  # Cambiar el estado
+        material.save()
+        estado = "habilitado" if material.activo else "inhabilitado"
+        messages.success(request, f"Material {estado} correctamente")
         return redirect("lista_materiales")
 
     # Si alguien entra por URL directa
