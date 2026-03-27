@@ -1,0 +1,283 @@
+{% extends "base.html" %}
+
+{% block title %}Materiales{% endblock %}
+
+{% block content %}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+    <div>
+        <h4 class="fw-bold mb-0">Gestión de Materiales</h4>
+        <p class="text-muted small mb-0">Administra el inventario de materiales de construcción</p>
+    </div>
+
+    <div class="d-flex gap-2">
+        <!-- Buscador -->
+        <form method="GET" class="d-flex">
+            <div class="input-group">
+                <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+                <input type="text" name="q" class="form-control border-start-0 ps-0" 
+                       placeholder="Buscar material..." value="{{ request.GET.q }}">
+            </div>
+        </form>
+
+        <button type="button" class="btn btn-primary px-4 rounded-pill" onclick="prepararCrear()" data-bs-toggle="modal" data-bs-target="#modalMaterial">
+            <i class="bi bi-plus-lg me-2"></i> Nuevo Material
+        </button>
+    </div>
+</div>
+
+<div class="table-container p-4">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
+                <tr>
+                    <th class="text-center">ID</th>
+                    <th>Material</th>
+                    <th>Tipo</th>
+                    <th class="text-center">Stock</th>
+                    <th class="text-center">Precio</th>
+                    <th class="text-center">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for material in materiales %}
+                <tr>
+                    <td class="text-center text-muted fw-bold">#{{ material.id }}</td>
+                    <td>
+                        <div class="fw-bold text-white">{{ material.nombre }}</div>
+                        <div class="text-white-50 small">{{ material.descripcion|truncatechars:50 }}</div>
+                    </td>
+                    <td><span class="badge-tipo">{{ material.tipo }}</span></td>
+                    <td class="text-center">
+                        <span class="fw-bold {% if material.stock < 10 %}text-danger{% else %}text-white{% endif %}">
+                            {{ material.stock }}
+                        </span>
+                    </td>
+                    <td class="text-center fw-800 text-accent">$ {{ material.precio }}</td>
+                    <td class="text-center">
+                        <div class="d-flex justify-content-center gap-2">
+                            <button class="btn-action" onclick="abrirModalEditar({{ material.id }})" title="Editar">
+                                <i class="bi bi-pencil-square"></i>
+                            </button>
+                            <form action="{% url 'inventario:eliminar_material' material.id %}" method="POST" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn-action text-danger" title="Eliminar" onclick="return confirm('¿Estás seguro?')">
+                                    <i class="bi bi-trash3-fill"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7" class="text-center py-5">
+                    <i class="bi bi-box-seam display-4 text-muted mb-3 d-block"></i>
+                    <p class="text-muted">No hay materiales registrados en el inventario</p>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- VENTANA EMERGENTE (MODAL) ÚNICA PARA CREAR Y EDITAR -->
+<div class="modal fade" id="modalMaterial" tabindex="-1" aria-labelledby="modalMaterialLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="background-color: var(--color-secondary); border-radius: 24px;">
+            <div class="modal-header border-bottom border-white-10 p-4">
+                <div class="d-flex align-items-center">
+                    <div class="bg-accent rounded-circle p-2 me-3 d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;">
+                        <i class="bi bi-box-seam text-dark fs-5"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title fw-800 text-white mb-0" id="modalMaterialLabel">Material</h5>
+                        <p class="text-muted small mb-0">Gestión de inventario de materiales</p>
+                    </div>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="formMaterial">
+                {% csrf_token %}
+                <div class="modal-body p-4">
+                    <input type="hidden" id="material_id" name="id">
+                    
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted text-uppercase" style="letter-spacing: 1px;">Nombre del Material</label>
+                        <input type="text" id="nombre" name="nombre" class="form-control" placeholder="Ej: Cemento Gris" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted text-uppercase" style="letter-spacing: 1px;">Tipo</label>
+                        <select id="tipo" name="tipo" class="form-select" required>
+                            <option value="">Seleccione tipo...</option>
+                            <option value="Cemento">Cemento</option>
+                            <option value="Arena">Arena</option>
+                            <option value="Grava">Grava</option>
+                            <option value="Ladrillo">Ladrillo</option>
+                            <option value="Herramientas">Herramientas</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted text-uppercase" style="letter-spacing: 1px;">Descripción Corta</label>
+                        <textarea id="descripcion" name="descripcion" class="form-control" rows="3" placeholder="Detalles del material..."></textarea>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-muted text-uppercase" style="letter-spacing: 1px;">Precio Unitario</label>
+                            <div class="input-group">
+                                <span class="input-group-text border-0 text-white-50" style="background: rgba(255,255,255,0.05);">$</span>
+                                <input type="number" id="precio" name="precio" class="form-control" placeholder="0.00" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-muted text-uppercase" style="letter-spacing: 1px;">Stock Inicial</label>
+                            <input type="number" id="stock" name="stock" class="form-control" placeholder="0" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-top border-white-10 p-4">
+                    <button type="button" class="btn btn-outline-light rounded-pill px-4" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="submit" class="btn btn-gold rounded-pill px-5 fw-800" id="btnGuardar">Guardar Material</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Estilos Premium para el Modal de Materiales */
+    #modalMaterial .modal-content {
+        background-color: #1a1a1a !important; 
+        border: 1px solid rgba(255, 255, 255, 0.15) !important;
+        border-radius: 28px !important;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8) !important;
+    }
+
+    #modalMaterial .modal-header {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+        padding: 1.5rem 2rem !important;
+    }
+    
+    #modalMaterial .modal-body {
+        padding: 2rem !important;
+    }
+
+    #modalMaterial .form-label {
+        font-family: 'Inter', sans-serif;
+        font-weight: 700;
+        font-size: 0.75rem;
+        letter-spacing: 1.2px;
+        color: var(--color-accent) !important;
+        margin-bottom: 0.75rem;
+        display: block;
+        text-transform: uppercase;
+    }
+
+    #modalMaterial .form-control, 
+    #modalMaterial .form-select {
+        background-color: #333333 !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border-radius: 16px !important;
+        padding: 12px 20px !important;
+        color: #ffffff !important;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+    }
+
+    #modalMaterial .form-control:focus, 
+    #modalMaterial .form-select:focus {
+        background-color: #444444 !important;
+        border-color: var(--color-accent) !important;
+        box-shadow: 0 0 0 4px rgba(243, 156, 18, 0.25) !important;
+        color: #ffffff !important;
+    }
+
+    #modalMaterial .btn-gold {
+        background: var(--color-accent) !important;
+        color: #000 !important;
+        font-weight: 800 !important;
+        padding: 14px 30px !important;
+        border-radius: 50px !important;
+        border: none !important;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(243, 156, 18, 0.3) !important;
+    }
+
+    #modalMaterial .btn-gold:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(243, 156, 18, 0.5) !important;
+    }
+</style>
+
+<script>
+    let modalInstance;
+    document.addEventListener('DOMContentLoaded', function() {
+        const modalElement = document.getElementById('modalMaterial');
+        if (modalElement) {
+            modalInstance = new bootstrap.Modal(modalElement);
+        }
+    });
+
+    const formMaterial = document.getElementById('formMaterial');
+
+    function prepararCrear() {
+        formMaterial.reset();
+        document.getElementById('material_id').value = '';
+        document.getElementById('modalMaterialLabel').innerText = 'Nuevo Material';
+        document.getElementById('btnGuardar').innerText = 'Crear Material';
+    }
+
+    function abrirModalEditar(id) {
+        document.getElementById('modalMaterialLabel').innerText = 'Editar Material';
+        document.getElementById('btnGuardar').innerText = 'Actualizar Material';
+        
+        const url = "{% url 'inventario:editar_material' 0 %}".replace('0', id);
+        
+        fetch(url, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('material_id').value = data.id;
+            document.getElementById('nombre').value = data.nombre;
+            document.getElementById('tipo').value = data.tipo;
+            document.getElementById('descripcion').value = data.descripcion;
+            document.getElementById('precio').value = data.precio;
+            document.getElementById('stock').value = data.stock;
+            modalInstance.show();
+        })
+        .catch(error => alert('Error al cargar datos'));
+    }
+
+    formMaterial.onsubmit = function(e) {
+        e.preventDefault();
+        const id = document.getElementById('material_id').value;
+        const url = id ? "{% url 'inventario:editar_material' 0 %}".replace('0', id) : "{% url 'inventario:crear_material' %}";
+        const formData = new FormData(formMaterial);
+
+        fetch(url, {
+            method: 'POST',
+            body: formData,
+            headers: { 
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                location.reload(); 
+            } else {
+                alert('Error al guardar: ' + (data.message || 'Error desconocido'));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error crítico al procesar la solicitud');
+        });
+    }
+</script>
+
+{% endblock %}

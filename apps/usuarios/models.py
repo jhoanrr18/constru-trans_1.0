@@ -37,6 +37,7 @@ class Usuario(models.Model):
     nombres = models.CharField(max_length=100, default="")
     apellidos = models.CharField(max_length=100, default="")
     telefono = models.CharField(max_length=20, blank=True)
+    foto_perfil = models.ImageField(upload_to='perfiles/', null=True, blank=True)
 
     tipo_documento = models.CharField(
         max_length=5,

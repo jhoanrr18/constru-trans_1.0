@@ -1,0 +1,202 @@
+{% extends "base.html" %}
+
+{% block title %}Detalle del Pedido - Constru-trans{% endblock %}
+
+{% block header_title %}Información del Pedido #CT-{{ orden.id }}{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="table-container p-4 p-md-5">
+            <div class="d-flex justify-content-between align-items-center mb-5 pb-3 border-bottom border-secondary">
+                <div>
+                    <h3 class="fw-800 text-white mb-1">Orden de Entrega</h3>
+                    <p class="text-muted small mb-0">Referencia: #CT-{{ orden.id }}</p>
+                </div>
+                <div class="text-end">
+                    {% if orden.estado == "pendiente" %}
+                    <span class="badge-tipo" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b; border-color: rgba(245, 158, 11, 0.2);">Pendiente</span>
+                    {% elif orden.estado == "en_ruta" %}
+                    <span class="badge-tipo" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6; border-color: rgba(59, 130, 246, 0.2);">En ruta</span>
+                    {% elif orden.estado == "entregado" %}
+                    <span class="badge-tipo" style="background: rgba(34, 197, 94, 0.1); color: #22c55e; border-color: rgba(34, 197, 94, 0.2);">Entregado</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="row g-5">
+                <!-- Columna Izquierda: Información -->
+                <div class="col-md-6">
+                    <div class="mb-5">
+                        <h6 class="fw-800 text-accent text-uppercase small mb-3" style="letter-spacing: 1px;">Datos del Cliente</h6>
+                        <div class="d-flex align-items-center p-3 rounded-4" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);">
+                            <div class="bg-accent rounded-circle p-3 me-3" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;">
+                                <i class="bi bi-person-fill text-dark fs-4"></i>
+                            </div>
+                            <div>
+                                <h5 class="fw-700 text-white mb-0">{{ orden.cliente.nombres }} {{ orden.cliente.apellidos }}</h5>
+                                <p class="text-muted small mb-0">{{ orden.cliente.user.email }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-5">
+                        <h6 class="fw-800 text-accent text-uppercase small mb-3" style="letter-spacing: 1px;">Logística de Entrega</h6>
+                        <div class="space-y-4">
+                            <div class="d-flex gap-3">
+                                <div class="text-accent fs-4"><i class="bi bi-geo-alt"></i></div>
+                                <div>
+                                    <p class="text-muted small mb-0">Dirección de Origen</p>
+                                    <p class="text-white fw-600 mb-0">{{ orden.direccion_origen }}</p>
+                                </div>
+                            </div>
+                            <div class="d-flex gap-3">
+                                <div class="text-accent fs-4"><i class="bi bi-geo-fill"></i></div>
+                                <div>
+                                    <p class="text-muted small mb-0">Dirección de Destino</p>
+                                    <p class="text-white fw-600 mb-0">{{ orden.direccion_destino }}</p>
+                                </div>
+                            </div>
+                            <div class="d-flex gap-3">
+                                <div class="text-accent fs-4"><i class="bi bi-calendar-check"></i></div>
+                                <div>
+                                    <p class="text-muted small mb-0">Fecha Programada</p>
+                                    <p class="text-white fw-600 mb-0">{{ orden.fecha|date:"d M, Y" }} - {{ orden.fecha_entrega_programada|date:"H:i"|default:"Pendiente" }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Columna Derecha: Materiales y Pago -->
+                <div class="col-md-6">
+                    <div class="mb-5">
+                        <h6 class="fw-800 text-accent text-uppercase small mb-3" style="letter-spacing: 1px;">Resumen de Materiales</h6>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle no-datatable">
+                                <thead>
+                                    <tr class="text-muted small border-bottom border-secondary">
+                                        <th class="ps-0">Material</th>
+                                        <th class="text-center">Cant.</th>
+                                        <th class="text-end pe-0">Subtotal</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for detalle in orden.detalles.all %}
+                                    <tr>
+                                        <td class="ps-0 text-white fw-600">{{ detalle.material.nombre }}</td>
+                                        <td class="text-center text-muted">{{ detalle.cantidad }}</td>
+                                        <td class="text-end pe-0 text-accent fw-700">$ {{ detalle.precio_unitario }}</td>
+                                    </tr>
+                                    {% empty %}
+                                        {% if orden.material %}
+                                        <tr>
+                                            <td class="ps-0 text-white fw-600">{{ orden.material.nombre }} (Unificado)</td>
+                                            <td class="text-center text-muted">{{ orden.cantidad }}</td>
+                                            <td class="text-end pe-0 text-accent fw-700">$ {{ orden.material.precio }}</td>
+                                        </tr>
+                                        {% else %}
+                                        <tr>
+                                            <td colspan="3" class="text-center py-4 text-muted">No hay detalles registrados.</td>
+                                        </tr>
+                                        {% endif %}
+                                    {% endfor %}
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="2" class="ps-0 pt-4 text-muted fw-700">Total de la Orden</td>
+                                        <td class="pe-0 pt-4 text-end"><h3 class="fw-900 text-white mb-0">$ {{ orden.precio }}</h3></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Sección para Admin y Cliente (Modificar/Cancelar) -->
+                    {% if user.usuario.rol == "admin" or user.usuario.rol == "cliente" and orden.estado != "entregado" and orden.estado != "cancelado" %}
+                    <div class="p-4 rounded-4 mb-4" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);">
+                        <h6 class="fw-800 text-accent text-uppercase small mb-3" style="letter-spacing: 1px;">Gestión del Pedido</h6>
+                        <div class="d-grid gap-2">
+                            {% if user.usuario.rol == "admin" %}
+                            <a href="{% url 'ordenes:editar_orden' orden.id %}" class="btn btn-outline-warning rounded-pill py-2 fw-700">
+                                <i class="bi bi-pencil-square me-2"></i> Modificar Pedido
+                            </a>
+                            <a href="{% url 'ordenes:eliminar_orden' orden.id %}" class="btn btn-outline-danger rounded-pill py-2 fw-700" onclick="return confirm('¿Estás seguro de cancelar este pedido?')">
+                                <i class="bi bi-x-circle me-2"></i> Cancelar Pedido
+                            </a>
+                            {% else %}
+                            <a href="{% url 'clientes:editar_pedido' orden.id %}" class="btn btn-outline-warning rounded-pill py-2 fw-700">
+                                <i class="bi bi-pencil-square me-2"></i> Modificar Pedido
+                            </a>
+                            <a href="{% url 'clientes:eliminar_orden' orden.id %}" class="btn btn-outline-danger rounded-pill py-2 fw-700" onclick="return confirm('¿Estás seguro de cancelar este pedido?')">
+                                <i class="bi bi-x-circle me-2"></i> Cancelar Pedido
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Sección EXCLUSIVA para el Administrador (Cambio de Estado Manual) -->
+                    {% if user.usuario.rol == "admin" %}
+                    <div class="p-4 rounded-4 mb-4" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);">
+                        <h6 class="fw-800 text-accent text-uppercase small mb-3" style="letter-spacing: 1px;">Control Maestro (Solo Admin)</h6>
+                        <form method="POST">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label class="text-muted small mb-2 d-block">Actualizar estado global del pedido:</label>
+                                <select name="estado" class="form-select rounded-pill border-0 px-4 bg-dark text-white">
+                                    <option value="pendiente" {% if orden.estado == 'pendiente' %}selected{% endif %}>Pendiente</option>
+                                    <option value="en_ruta" {% if orden.estado == 'en_ruta' %}selected{% endif %}>En Ruta</option>
+                                    <option value="entregado" {% if orden.estado == 'entregado' %}selected{% endif %}>Entregado</option>
+                                    <option value="cancelado" {% if orden.estado == 'cancelado' %}selected{% endif %}>Cancelado</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-gold w-100 rounded-pill py-2 fw-800 shadow-sm">
+                                <i class="bi bi-save me-2"></i> Aplicar Cambio
+                            </button>
+                        </form>
+                    </div>
+                    {% endif %}
+
+                    <!-- Sección EXCLUSIVA para el Conductor -->
+                    {% if user.usuario.rol == "conductor" and orden.conductor == user.usuario and orden.estado != "entregado" and orden.estado != "cancelado" %}
+                    <div class="p-4 rounded-4" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);">
+                        <h6 class="fw-800 text-accent text-uppercase small mb-3" style="letter-spacing: 1px;">Panel del Conductor</h6>
+                        <p class="text-muted small mb-4">Como conductor asignado, puedes confirmar la entrega exitosa o reportar una cancelación.</p>
+                        <form method="POST" class="d-grid gap-3">
+                            {% csrf_token %}
+                            <button type="submit" name="accion" value="confirmar" class="btn btn-success rounded-pill py-3 fw-800 d-flex align-items-center justify-content-center gap-2 shadow-sm">
+                                <i class="bi bi-check-circle-fill"></i> Confirmar Entrega
+                            </button>
+                            <button type="submit" name="accion" value="cancelar" class="btn btn-outline-danger rounded-pill py-2 fw-700" onclick="return confirm('¿Estás seguro de cancelar esta entrega?')">
+                                <i class="bi bi-x-circle me-2"></i> Cancelar Entrega
+                            </button>
+                        </form>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="mt-5 pt-4 border-top border-secondary d-flex justify-content-between align-items-center">
+                <a href="javascript:history.back()" class="btn btn-outline-light rounded-pill px-4">
+                    <i class="bi bi-arrow-left me-2"></i> Volver
+                </a>
+                <button class="btn btn-outline-light rounded-pill px-4" onclick="window.print()">
+                    <i class="bi bi-printer me-2"></i> Imprimir Comprobante
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .fw-900 { font-weight: 900; }
+    .fw-800 { font-weight: 800; }
+    .fw-700 { font-weight: 700; }
+    .fw-600 { font-weight: 600; }
+    .text-accent { color: var(--color-accent) !important; }
+    .space-y-4 > * + * { margin-top: 1.5rem; }
+</style>
+
+{% endblock %}

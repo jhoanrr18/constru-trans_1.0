@@ -1,15 +1,15 @@
 :root {
-    --color-primary: #600000; /* Deep Red / Bordeaux */
-    --color-secondary: #050a14; /* Dark Blue / Navy */
-    --color-accent: #caa030; /* Gold */
-    --color-dark: #1e1e1e; /* Dark Gray */
+    --color-primary: #0056B3;
+    --color-secondary: #333333;
+    --color-accent: #F39C12;
+    --color-dark: #000000;
     --color-neutral-800: #27272a;
-    --color-bg: #ffffff; /* CAMBIADO A BLANCO */
-    --color-text: #1a1a1a; /* CAMBIADO A NEGRO/GRIS OSCURO */
-    --color-gold: #caa030;
-    --color-muted: #64748b;
-    --color-surface: #f8fafc; /* Fondo suave para tarjetas */
-    --color-border: #e2e8f0;
+    --color-bg: #000000;
+    --color-text: #FFFFFF;
+    --color-gold: #F39C12;
+    --color-muted: #CCCCCC;
+    --color-surface: #38517C;
+    --color-border: rgba(255,255,255,0.1);
     --color-success: #22c55e;
     --color-warning: #f59e0b;
     --color-danger: #ef4444;
@@ -129,12 +129,16 @@ a:hover {
 }
 
 .color-oscuro-fn {
-    color: #000000 !important; /* Forzado a negro */
+    color: var(--color-text) !important;
 }
 
 .color-dorado-bg {
-    background-color: var(--color-accent)!important;
-    color: #000 !important;
+    background-color: var(--color-accent) !important;
+    color: #000000 !important;
+}
+
+.color-dorado-bg h1, .color-dorado-bg h2, .color-dorado-bg h3, .color-dorado-bg h4, .color-dorado-bg p {
+    color: #000000 !important;
 }
 
 /* Mission & Lists */

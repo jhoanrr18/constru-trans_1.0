@@ -1,0 +1,72 @@
+{% extends "usuarios/panel-sesion.html" %}
+{% load static %}
+
+{% block title %}Crear Cuenta - Constru-trans{% endblock %}
+
+{% block content %}
+<div class="animate-up">
+    <h1 class="welcome-h1">REGÍSTRATE</h1>
+    <p class="welcome-p">¿Ya tienes una cuenta? <a href="{% url 'usuarios:login' %}">Inicia sesión</a></p>
+</div>
+
+{% if error %}
+    <div class="alert-custom animate__animated animate__shakeX">
+        <i class="bi bi-exclamation-circle-fill me-2"></i> {{ error }}
+    </div>
+{% endif %}
+
+<form method="POST" class="animate-up delay-1">
+    {% csrf_token %}
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-6">
+            <label class="label-custom">Nombres</label>
+            <input type="text" name="nombres" class="input-custom" placeholder="Juan" required>
+        </div>
+        <div class="col-md-6">
+            <label class="label-custom">Apellidos</label>
+            <input type="text" name="apellidos" class="input-custom" placeholder="Pérez" required>
+        </div>
+    </div>
+
+    <div class="form-group-custom">
+        <label class="label-custom">Correo Electrónico</label>
+        <input type="email" name="correo" class="input-custom" placeholder="ejemplo@correo.com" required>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <label class="label-custom">Tipo</label>
+            <select name="tipo_documento" class="input-custom form-select" style="background-image: none;" required>
+                <option value="CC">C.C.</option>
+                <option value="CE">C.E.</option>
+                <option value="NIT">NIT</option>
+            </select>
+        </div>
+        <div class="col-md-8">
+            <label class="label-custom">Documento</label>
+            <input type="text" name="documento" class="input-custom" placeholder="12345678" required>
+        </div>
+    </div>
+
+    <div class="form-group-custom">
+        <label class="label-custom">Teléfono</label>
+        <input type="text" name="telefono" class="input-custom" placeholder="3001234567" required>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-6">
+            <label class="label-custom">Contraseña</label>
+            <input type="password" name="contrasena" class="input-custom" placeholder="••••••••" required>
+        </div>
+        <div class="col-md-6">
+            <label class="label-custom">Confirmar</label>
+            <input type="password" name="confirmar_contrasena" class="input-custom" placeholder="••••••••" required>
+        </div>
+    </div>
+
+    <button type="submit" class="btn-main">
+        Crear Cuenta
+    </button>
+</form>
+{% endblock %}

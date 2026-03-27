@@ -5,7 +5,6 @@ from django.contrib.auth import views as auth_views
 app_name = 'usuarios'
 
 urlpatterns = [
-
     # auth
     path("login/", views.login_usuario, name="login"),
     path("registro/", views.registro, name="registro"),
@@ -18,33 +17,9 @@ urlpatterns = [
     path("usuarios/eliminar/<int:id>/", views.eliminar_usuario, name="eliminar_usuario"),
     path("usuarios/editar/<int:id>/", views.editar_usuario, name="editar_usuario"),
     path("perfil-admin/", views.perfil_admin, name="perfil_admin"),
+    path("perfil/editar/", views.editar_perfil, name="editar_perfil"),
 
     path("conductores/", views.lista_conductores, name="lista_conductores"),
-    path("vehiculos/", views.lista_vehiculos, name="lista_vehiculos"),
-    path("vehiculos/crear/", views.crear_vehiculo, name="crear_vehiculo"),
-
-    path("pedido-detalle/<int:id>/", views.pedido_detalle, name="pedido_detalle"),
-
-    path("reportes/", views.reportes_admin, name="reportes_admin"),
-
-    # cliente
-    path("panel-cliente/", views.panel_cliente, name="panel_cliente"),
-    path("perfil/", views.perfil_cliente, name="perfil_cliente"),
-
-    # pedidos cliente
-    path("pedido/crear/", views.crear_pedido, name="crear_pedido"),
-    path("pedido/editar/<int:id>/", views.editar_pedido, name="editar_pedido"),
-    path("mis-pedidos/", views.mis_pedidos, name="mis_pedidos"),
-    path("seguimiento/", views.seguimiento_pedidos, name="seguimiento_pedidos"),
-    path("historial/", views.historial_pedidos, name="historial_pedidos"),
-
-
-    # materiales
-    path("materiales/", views.materiales_lista, name="materiales_lista"),
-    path("materiales/api/", views.api_materiales, name="api_materiales"),
-    path("materiales/crear/", views.crear_material, name="crear_material"),
-    path("materiales/editar/<int:id>/", views.editar_material, name="editar_material"),
-    path("materiales/eliminar/<int:id>/", views.eliminar_material, name="eliminar_material"),
 
     # conductor
     path("panel-conductor/", views.panel_conductor, name="panel_conductor"),
@@ -52,9 +27,7 @@ urlpatterns = [
     path("pedidos-conductor/", views.pedidos_conductor, name="pedidos_conductor"),
     path("mis-entregas/", views.mis_entregas, name="mis_entregas"),
 
-    path("orden/eliminar/<int:id>/", views.eliminar_orden, name="eliminar_orden"),
-
-    # recuperar contraseña (HU-01)
+    # recuperar contraseña
     path(
         "recuperar/",
         views.CustomPasswordResetView.as_view(
@@ -64,29 +37,11 @@ urlpatterns = [
         ),
         name="password_reset"
     ),
-
     path(
         "recuperar/enviado/",
         auth_views.PasswordResetDoneView.as_view(
             template_name="usuarios/password_enviado.html"
         ),
         name="password_reset_done"
-    ),
-
-    path(
-        "recuperar/<uidb64>/<token>/",
-        auth_views.PasswordResetConfirmView.as_view(
-            template_name="usuarios/password_confirmar.html",
-            success_url="/usuarios/recuperar/completo/"
-        ),
-        name="password_reset_confirm"
-    ),
-
-    path(
-        "recuperar/completo/",
-        auth_views.PasswordResetCompleteView.as_view(
-            template_name="usuarios/password_completo.html"
-        ),
-        name="password_reset_complete"
     ),
 ]

@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}Vehículos - Constru-trans{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-5">
+    <div>
+        <h2 class="fw-bold mb-0">Gestión de Vehículos</h2>
+        <p class="text-muted small mb-0">Control de flota y disponibilidad de transporte</p>
+    </div>
+    <a href="{% url 'transporte:crear_vehiculo' %}" class="btn btn-gold rounded-pill px-4 shadow-sm">
+        <i class="bi bi-plus-circle me-2"></i> Crear Vehículo
+    </a>
+</div>
+
+<div class="table-container p-4">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
+                <tr>
+                    <th class="text-center">ID</th>
+                    <th class="text-center">Placa</th>
+                    <th class="text-center">Tipo</th>
+                    <th class="text-center">Capacidad</th>
+                    <th class="text-center">Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for vehiculo in vehiculos %}
+                <tr>
+                    <td class="text-center text-muted fw-bold">#{{ vehiculo.id }}</td>
+                    <td class="text-center fw-800 text-white">{{ vehiculo.placa }}</td>
+                    <td class="text-center">
+                        <span class="badge-tipo">{{ vehiculo.tipo }}</span>
+                    </td>
+                    <td class="text-center text-muted">{{ vehiculo.capacidad }} Ton</td>
+                    <td class="text-center">
+                        {% if vehiculo.estado == "disponible" or vehiculo.estado == "Disponible" %}
+                        <span class="badge-tipo" style="background: rgba(34, 197, 94, 0.1); color: #22c55e; border-color: rgba(34, 197, 94, 0.2);">
+                            <i class="bi bi-check-circle-fill me-1"></i> Disponible
+                        </span>
+                        {% elif vehiculo.estado == "en_ruta" or vehiculo.estado == "En Ruta" %}
+                        <span class="badge-tipo" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6; border-color: rgba(59, 130, 246, 0.2);">
+                            <i class="bi bi-truck me-1"></i> En Ruta
+                        </span>
+                        {% else %}
+                        <span class="badge-tipo" style="background: rgba(239, 68, 68, 0.1); color: #ef4444; border-color: rgba(239, 68, 68, 0.2);">
+                            {{ vehiculo.estado|title }}
+                        </span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center py-5 text-muted">
+                        <i class="bi bi-truck fs-1 d-block mb-3 opacity-25"></i>
+                        No hay vehículos registrados en la flota
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+    .fw-800 { font-weight: 800; }
+</style>
+
+{% endblock %}
