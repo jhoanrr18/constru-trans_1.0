@@ -105,19 +105,56 @@
                         </div>
                     </div>
 
-                    {% if user.usuario.rol == "admin" or user.usuario.rol == "conductor" %}
-                    <div class="p-4 rounded-4" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);">
-                        <h6 class="fw-800 text-accent text-uppercase small mb-3" style="letter-spacing: 1px;">Gestión de Estado</h6>
+                    <!-- Sección para Admin y Cliente (Modificar/Cancelar) -->
+                    {% if user.usuario.rol == "admin" or user.usuario.rol == "cliente" and orden.estado == "pendiente" %}
+                    <div class="p-4 rounded-4 mb-4" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);">
+                        <h6 class="fw-800 text-accent text-uppercase small mb-3" style="letter-spacing: 1px;">Gestión del Pedido</h6>
+                        <div class="d-grid gap-2">
+                            <a href="{% url 'usuarios:editar_pedido' orden.id %}" class="btn btn-outline-warning rounded-pill py-2 fw-700">
+                                <i class="bi bi-pencil-square me-2"></i> Modificar Pedido
+                            </a>
+                            <a href="{% url 'usuarios:eliminar_orden' orden.id %}" class="btn btn-outline-danger rounded-pill py-2 fw-700" onclick="return confirm('¿Estás seguro de cancelar este pedido?')">
+                                <i class="bi bi-x-circle me-2"></i> Cancelar Pedido
+                            </a>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Sección EXCLUSIVA para el Administrador (Cambio de Estado Manual) -->
+                    {% if user.usuario.rol == "admin" %}
+                    <div class="p-4 rounded-4 mb-4" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);">
+                        <h6 class="fw-800 text-accent text-uppercase small mb-3" style="letter-spacing: 1px;">Control Maestro (Solo Admin)</h6>
                         <form method="POST">
                             {% csrf_token %}
                             <div class="mb-3">
-                                <select name="estado" class="form-select rounded-pill border-0 px-4">
+                                <label class="text-muted small mb-2 d-block">Actualizar estado global del pedido:</label>
+                                <select name="estado" class="form-select rounded-pill border-0 px-4 bg-dark text-white">
                                     <option value="pendiente" {% if orden.estado == 'pendiente' %}selected{% endif %}>Pendiente</option>
                                     <option value="en_ruta" {% if orden.estado == 'en_ruta' %}selected{% endif %}>En Ruta</option>
                                     <option value="entregado" {% if orden.estado == 'entregado' %}selected{% endif %}>Entregado</option>
+                                    <option value="cancelado" {% if orden.estado == 'cancelado' %}selected{% endif %}>Cancelado</option>
                                 </select>
                             </div>
-                            <button type="submit" class="btn btn-gold w-100 rounded-pill py-2 fw-800">Actualizar Estado</button>
+                            <button type="submit" class="btn btn-gold w-100 rounded-pill py-2 fw-800 shadow-sm">
+                                <i class="bi bi-save me-2"></i> Aplicar Cambio
+                            </button>
+                        </form>
+                    </div>
+                    {% endif %}
+
+                    <!-- Sección EXCLUSIVA para el Conductor -->
+                    {% if user.usuario.rol == "conductor" and orden.conductor == user.usuario and orden.estado != "entregado" and orden.estado != "cancelado" %}
+                    <div class="p-4 rounded-4" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);">
+                        <h6 class="fw-800 text-accent text-uppercase small mb-3" style="letter-spacing: 1px;">Panel del Conductor</h6>
+                        <p class="text-muted small mb-4">Como conductor asignado, puedes confirmar la entrega exitosa o reportar una cancelación.</p>
+                        <form method="POST" class="d-grid gap-3">
+                            {% csrf_token %}
+                            <button type="submit" name="accion" value="confirmar" class="btn btn-success rounded-pill py-3 fw-800 d-flex align-items-center justify-content-center gap-2 shadow-sm">
+                                <i class="bi bi-check-circle-fill"></i> Confirmar Entrega
+                            </button>
+                            <button type="submit" name="accion" value="cancelar" class="btn btn-outline-danger rounded-pill py-2 fw-700" onclick="return confirm('¿Estás seguro de cancelar esta entrega?')">
+                                <i class="bi bi-x-circle me-2"></i> Cancelar Entrega
+                            </button>
                         </form>
                     </div>
                     {% endif %}

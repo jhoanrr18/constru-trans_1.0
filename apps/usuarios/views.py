@@ -231,7 +231,12 @@ def mis_pedidos(request):
 
 @login_required
 def perfil_admin(request):
-    usuario = request.user.usuario
+    try:
+        usuario = request.user.usuario
+    except Usuario.DoesNotExist:
+        logout(request)
+        return redirect("usuarios:login")
+        
     context = {
         "usuario": usuario,
         "usuarios_count": Usuario.objects.count(),
@@ -399,14 +404,21 @@ def lista_conductores(request):
 @login_required
 def perfil_conductor(request):
     conductor_id = request.GET.get('id')
+    
+    # Si se pasa un ID y el usuario es admin, buscamos a ese conductor
     if conductor_id and request.user.usuario.rol == 'admin':
         conductor = get_object_or_404(Usuario, id=conductor_id)
     else:
-        conductor = request.user.usuario
+        # De lo contrario, usamos el perfil del usuario actual
+        try:
+            conductor = request.user.usuario
+        except Usuario.DoesNotExist:
+            logout(request)
+            return redirect("usuarios:login")
         
     pedidos = Orden.objects.filter(conductor=conductor)
     
-    # Obtener el último vehículo asignado a través de Entrega
+    # Intentar obtener el último vehículo asignado
     from apps.ordenes.models import Entrega
     ultima_entrega = Entrega.objects.filter(conductor=conductor).order_by('-fecha').first()
     vehiculo = ultima_entrega.vehiculo if ultima_entrega else None
@@ -704,6 +716,8 @@ def editar_pedido(request, id):
         orden.save()
         
         messages.success(request, f"Pedido #{orden.id} actualizado correctamente.")
+        if request.user.usuario.rol == "admin":
+            return redirect("usuarios:lista_pedidos_admin")
         return redirect("usuarios:mis_pedidos")
         
     return render(request, "clientes/editar_pedido.html", {
@@ -720,6 +734,37 @@ class CustomPasswordResetView(auth_views.PasswordResetView):
 @login_required
 def pedido_detalle(request, id):
     orden = get_object_or_404(Orden, id=id)
+    usuario = request.user.usuario
+
+    if request.method == "POST":
+        if usuario.rol == "admin":
+            nuevo_estado = request.POST.get("estado")
+            if nuevo_estado in ["pendiente", "en_ruta", "entregado", "cancelado"]:
+                orden.estado = nuevo_estado
+                if nuevo_estado == "entregado":
+                    orden.fecha_entrega_real = now()
+                elif nuevo_estado == "en_ruta":
+                    orden.fecha_toma_entrega = now()
+                orden.save()
+                messages.success(request, f"Estado del pedido #{orden.id} actualizado a {orden.get_estado_display()}.")
+        
+        elif usuario.rol == "conductor" and orden.conductor == usuario:
+            accion = request.POST.get("accion")
+            if accion == "confirmar":
+                orden.estado = "entregado"
+                orden.fecha_entrega_real = now()
+                orden.save()
+                messages.success(request, f"Entrega del pedido #{orden.id} confirmada.")
+            elif accion == "cancelar":
+                # El conductor cancela su participación o reporta problema, lo marcamos como pendiente para reasignar?
+                # Según el usuario "cancelar la entrega", supongo que es cancelar el pedido o la entrega específica.
+                # Vamos a marcarlo como cancelado por ahora.
+                orden.estado = "cancelado"
+                orden.save()
+                messages.warning(request, f"Entrega del pedido #{orden.id} cancelada.")
+        
+        return redirect("usuarios:pedido_detalle", id=orden.id)
+
     return render(request, "dashboard/pedido_detalle.html", {
         "orden": orden
     })

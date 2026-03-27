@@ -85,7 +85,7 @@
                         <span class="badge-tipo" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6; border-color: rgba(59, 130, 246, 0.2);">{{ pedido.estado|title }}</span>
                     </td>
                     <td class="text-center">
-                        <a href="{% url 'ordenes:editar_orden' pedido.id %}" class="btn-action" title="Ver Detalle">
+                        <a href="{% url 'usuarios:pedido_detalle' pedido.id %}" class="btn-action" title="Ver Detalle">
                             <i class="bi bi-eye"></i>
                         </a>
                     </td>

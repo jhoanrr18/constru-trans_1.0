@@ -5,9 +5,9 @@
 
 {% block content %}
 
-<div class="row g-4">
+<div class="row g-4 justify-content-center">
     <!-- Perfil Principal -->
-    <div class="col-md-4">
+    <div class="col-md-5">
         <div class="table-container p-4 h-100 border-0" style="background: rgba(255,255,255,0.02);">
             <div class="text-center mb-5">
                 <div class="position-relative d-inline-block mb-3">
@@ -56,7 +56,7 @@
     </div>
 
     <!-- Gestión de Sistema -->
-    <div class="col-md-4">
+    <div class="col-md-5">
         <div class="table-container p-4 h-100 border-0" style="background: rgba(255,255,255,0.02);">
             <h5 class="fw-800 text-white mb-4">Gestión de Sistema</h5>
             
@@ -66,7 +66,7 @@
                 <span class="small text-muted text-uppercase fw-800" style="letter-spacing: 1px;">MODO ADMINISTRACIÓN</span>
             </div>
             
-            <div class="px-2">
+            <div class="px-2 mb-5">
                 <div class="d-flex justify-content-between align-items-center py-3 border-bottom border-secondary">
                     <span class="text-muted fw-600">Total Usuarios</span>
                     <span class="fw-700 text-white">{{ usuarios_count }}</span>
@@ -80,37 +80,8 @@
                     <span class="fw-700 text-white">{{ ordenes_count }}</span>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <!-- Estadísticas de Sistema -->
-    <div class="col-md-4">
-        <div class="table-container p-4 h-100 border-0" style="background: rgba(255,255,255,0.02);">
-            <h5 class="fw-800 text-white mb-4">Métricas Globales</h5>
-            
-            <div class="space-y-4">
-                <div class="stat-card p-4 border-0" style="border-left: 4px solid var(--color-accent) !important; background: #111111;">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <p class="text-muted small mb-0 text-uppercase fw-800" style="letter-spacing: 1px;">VENTAS TOTALES</p>
-                            <h2 class="fw-900 text-white mb-0">${{ total_ventas|floatformat:0 }}</h2>
-                        </div>
-                        <i class="bi bi-graph-up-arrow fs-3 text-accent opacity-50"></i>
-                    </div>
-                </div>
-                
-                <div class="stat-card p-4 border-0" style="border-left: 4px solid #22c55e !important; background: #111111;">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <p class="text-muted small mb-0 text-uppercase fw-800" style="letter-spacing: 1px;">PEDIDOS ENTREGADOS</p>
-                            <h2 class="fw-900 text-white mb-0">{{ entregados_count }}</h2>
-                        </div>
-                        <i class="bi bi-check-all fs-3 text-success opacity-50"></i>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="mt-5 pt-4 border-top border-secondary">
+            <div class="mt-auto pt-4 border-top border-secondary">
                 <a href="{% url 'usuarios:panel' %}" class="btn btn-gold w-100 rounded-pill py-3 fw-800 shadow-sm d-flex align-items-center justify-content-center gap-2">
                     <i class="bi bi-grid-1x2-fill"></i> Ir al Panel General
                 </a>

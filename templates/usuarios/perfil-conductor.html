@@ -14,7 +14,7 @@
                 <div class="position-relative d-inline-block mb-3">
                     <div class="rounded-circle d-flex align-items-center justify-content-center fw-900 shadow-lg" 
                          style="width: 120px; height: 120px; background: var(--color-accent); color: #000; font-size: 2.5rem; border: 4px solid #1a1a1a;">
-                        {{ conductor.nombres|slice:":1" }}{{ conductor.apellidos|slice:":1" }}
+                        {% if conductor.nombres %}{{ conductor.nombres|slice:":1"|upper }}{% endif %}{% if conductor.apellidos %}{{ conductor.apellidos|slice:":1"|upper }}{% endif %}
                     </div>
                     <span class="position-absolute bottom-0 end-0 bg-success border border-3 border-dark rounded-circle p-2" style="width: 20px; height: 20px;"></span>
                 </div>
@@ -137,7 +137,5 @@
     .space-y-4 > * + * { margin-top: 1.5rem; }
     .space-y-3 > * + * { margin-top: 1rem; }
 </style>
-
-{% endblock %}
 
 {% endblock %}
