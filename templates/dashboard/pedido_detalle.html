@@ -90,9 +90,17 @@
                                         <td class="text-end pe-0 text-accent fw-700">$ {{ detalle.precio_unitario }}</td>
                                     </tr>
                                     {% empty %}
-                                    <tr>
-                                        <td colspan="3" class="text-center py-4 text-muted">No hay detalles registrados.</td>
-                                    </tr>
+                                        {% if orden.material %}
+                                        <tr>
+                                            <td class="ps-0 text-white fw-600">{{ orden.material.nombre }} (Unificado)</td>
+                                            <td class="text-center text-muted">{{ orden.cantidad }}</td>
+                                            <td class="text-end pe-0 text-accent fw-700">$ {{ orden.material.precio }}</td>
+                                        </tr>
+                                        {% else %}
+                                        <tr>
+                                            <td colspan="3" class="text-center py-4 text-muted">No hay detalles registrados.</td>
+                                        </tr>
+                                        {% endif %}
                                     {% endfor %}
                                 </tbody>
                                 <tfoot>
@@ -106,7 +114,7 @@
                     </div>
 
                     <!-- Sección para Admin y Cliente (Modificar/Cancelar) -->
-                    {% if user.usuario.rol == "admin" or user.usuario.rol == "cliente" and orden.estado == "pendiente" %}
+                    {% if user.usuario.rol == "admin" or user.usuario.rol == "cliente" and orden.estado != "entregado" and orden.estado != "cancelado" %}
                     <div class="p-4 rounded-4 mb-4" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);">
                         <h6 class="fw-800 text-accent text-uppercase small mb-3" style="letter-spacing: 1px;">Gestión del Pedido</h6>
                         <div class="d-grid gap-2">

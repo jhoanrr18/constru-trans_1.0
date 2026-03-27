@@ -49,7 +49,7 @@
                             <a href="{% url 'usuarios:pedido_detalle' pedido.id %}" class="btn-action" title="Ver Detalles">
                                 <i class="bi bi-eye"></i>
                             </a>
-                            {% if pedido.estado == 'pendiente' %}
+                            {% if pedido.estado != 'entregado' and pedido.estado != 'cancelado' %}
                             <a href="{% url 'usuarios:editar_pedido' pedido.id %}" class="btn-action text-warning" title="Editar">
                                 <i class="bi bi-pencil-square"></i>
                             </a>

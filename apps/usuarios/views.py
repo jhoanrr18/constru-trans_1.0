@@ -91,11 +91,16 @@ def login_usuario(request):
                     user=user,
                     defaults={'nombres': user.username, 'apellidos': '', 'rol': 'admin'}
                 )
-                return redirect("usuarios:panel")
+                return redirect(request.GET.get('next') or "usuarios:panel")
 
             # Para usuarios normales, verificamos el perfil usando filter() para evitar el error amarillo
             perfil = Usuario.objects.filter(user=user).first()
             if perfil:
+                # Priorizar el parámetro 'next' para redirecciones post-login
+                next_url = request.GET.get('next')
+                if next_url:
+                    return redirect(next_url)
+                
                 if perfil.rol == "admin":
                     return redirect("usuarios:panel")
                 elif perfil.rol == "cliente":
@@ -293,6 +298,11 @@ def historial_pedidos(request):
 # ---------------- GESTIÓN DE USUARIOS ----------------
 @login_required
 def crear_usuario(request):
+    # Solo el administrador puede crear usuarios desde el panel
+    if request.user.usuario.rol != 'admin':
+        messages.error(request, "No tienes permisos para realizar esta acción.")
+        return redirect("usuarios:panel")
+
     if request.method == "POST":
         nombre_completo = request.POST.get("nombre")
         email = request.POST.get("email")
@@ -301,6 +311,15 @@ def crear_usuario(request):
         rol = request.POST.get("rol")
         tipo_doc = request.POST.get("tipo_doc")
         documento = request.POST.get("documento")
+
+        # Validaciones básicas
+        if not all([nombre_completo, email, password, telefono, rol, tipo_doc, documento]):
+            messages.error(request, "Todos los campos son obligatorios.")
+            return render(request, "dashboard/usuario_form.html", {"form_data": request.POST})
+
+        if User.objects.filter(email=email).exists() or User.objects.filter(username=email).exists():
+            messages.error(request, "Este correo electrónico ya está registrado.")
+            return render(request, "dashboard/usuario_form.html", {"form_data": request.POST})
 
         # Dividir nombre completo en nombres y apellidos
         partes = nombre_completo.split(' ', 1)
@@ -367,6 +386,11 @@ def lista_usuarios(request):
 
 @login_required
 def eliminar_usuario(request, id):
+    # Solo el administrador puede eliminar usuarios
+    if request.user.usuario.rol != 'admin':
+        messages.error(request, "No tienes permisos para realizar esta acción.")
+        return redirect("usuarios:panel")
+
     usuario_obj = get_object_or_404(Usuario, id=id) 
     usuario_obj.delete()
     messages.success(request, "Usuario eliminado correctamente.")
@@ -376,6 +400,12 @@ def eliminar_usuario(request, id):
 @login_required
 def editar_usuario(request, id):
     usuario = get_object_or_404(Usuario, id=id)
+    
+    # Solo el administrador puede editar otros usuarios
+    if request.user.usuario.rol != 'admin' and request.user.usuario != usuario:
+        messages.error(request, "No tienes permisos para editar este perfil.")
+        return redirect("usuarios:panel")
+
     if request.method == "POST":
         usuario.nombres = request.POST.get("nombres")
         usuario.apellidos = request.POST.get("apellidos")
@@ -478,12 +508,21 @@ def api_materiales(request):
 
 @login_required
 def crear_material(request):
+    # Solo el administrador puede crear materiales
+    if request.user.usuario.rol != 'admin':
+        messages.error(request, "No tienes permisos para realizar esta acción.")
+        return redirect("usuarios:panel")
+
     if request.method == "POST":
         nombre = request.POST.get("nombre")
         tipo = request.POST.get("tipo")
         descripcion = request.POST.get("descripcion")
         precio = request.POST.get("precio")
         stock = request.POST.get("stock")
+
+        if not all([nombre, tipo, precio, stock]):
+            messages.error(request, "Los campos Nombre, Tipo, Precio y Stock son obligatorios.")
+            return render(request, "dashboard/material_form.html", {"material": request.POST})
 
         try:
             Material.objects.create(
@@ -580,11 +619,12 @@ def crear_pedido(request):
         materiales_ids = request.POST.getlist('material_id[]')
         cantidades = request.POST.getlist('cantidad[]')
         direccion = request.POST.get("direccion")
+        fecha_entrega = request.POST.get("fecha_entrega")
 
         if not materiales_ids or not direccion:
+            messages.error(request, "Por favor, agrega al menos un material y la dirección.")
             return render(request, "clientes/crear_pedido.html", {
-                "materiales": materiales,
-                "error": "Por favor, agrega al menos un material y la dirección."
+                "materiales": materiales
             })
 
         try:
@@ -592,7 +632,6 @@ def crear_pedido(request):
             from django.db import transaction
 
             total_general = 0
-            detalles_pendientes = []
 
             with transaction.atomic():
                 # 1. Crear la Orden principal
@@ -600,7 +639,8 @@ def crear_pedido(request):
                     cliente=cliente,
                     direccion_origen="Bodega Central",
                     direccion_destino=direccion,
-                    estado="pendiente"
+                    estado="pendiente",
+                    fecha_entrega_programada=fecha_entrega if fecha_entrega else None
                 )
 
                 # 2. Procesar cada material
@@ -638,14 +678,14 @@ def crear_pedido(request):
             return redirect("usuarios:mis_pedidos")
 
         except ValueError as e:
+            messages.error(request, str(e))
             return render(request, "clientes/crear_pedido.html", {
-                "materiales": materiales,
-                "error": str(e)
+                "materiales": materiales
             })
         except Exception as e:
+            messages.error(request, f"Error interno: {e}")
             return render(request, "clientes/crear_pedido.html", {
-                "materiales": materiales,
-                "error": f"Error interno: {e}"
+                "materiales": materiales
             })
 
     return render(request, "clientes/crear_pedido.html", {
@@ -678,9 +718,9 @@ def lista_pedidos_admin(request):
 
 @login_required
 def ver_pedido_admin(request, id):
-    pedido = get_object_or_404(Orden, id=id)
+    orden = get_object_or_404(Orden, id=id)
     return render(request, "dashboard/pedido_detalle.html", {
-        "pedido": pedido
+        "orden": orden
     })
 
 

@@ -19,48 +19,48 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{% url 'ordenes:lista_ordenes' %}" class="nav-link-custom {% if 'ordenes' in request.path %}active{% endif %}">
+                    <a href="{% url 'ordenes:lista_ordenes' %}" class="nav-link-custom {% if request.resolver_match.url_name == 'lista_ordenes' or 'ordenes' in request.path %}active{% endif %}">
                         <i class="bi bi-cart-fill"></i> Pedidos
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{% url 'usuarios:lista_usuarios' %}" class="nav-link-custom {% if 'usuarios' in request.path and 'perfil' not in request.path and 'materiales' not in request.path and 'vehiculos' not in request.path %}active{% endif %}">
+                    <a href="{% url 'usuarios:lista_usuarios' %}" class="nav-link-custom {% if request.resolver_match.url_name == 'lista_usuarios' or request.resolver_match.url_name == 'crear_usuario' or request.resolver_match.url_name == 'editar_usuario' %}active{% endif %}">
                         <i class="bi bi-people-fill"></i> Clientes
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{% url 'usuarios:materiales_lista' %}" class="nav-link-custom {% if 'materiales' in request.path %}active{% endif %}">
+                    <a href="{% url 'usuarios:materiales_lista' %}" class="nav-link-custom {% if 'materiales' in request.resolver_match.url_name %}active{% endif %}">
                         <i class="bi bi-box-seam-fill"></i> Materiales
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{% url 'usuarios:lista_vehiculos' %}" class="nav-link-custom {% if 'vehiculos' in request.path %}active{% endif %}">
+                    <a href="{% url 'usuarios:lista_vehiculos' %}" class="nav-link-custom {% if 'vehiculo' in request.resolver_match.url_name %}active{% endif %}">
                         <i class="bi bi-truck"></i> Vehículos
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{% url 'usuarios:reportes_admin' %}" class="nav-link-custom {% if 'reportes' in request.path %}active{% endif %}">
+                    <a href="{% url 'usuarios:reportes_admin' %}" class="nav-link-custom {% if request.resolver_match.url_name == 'reportes_admin' %}active{% endif %}">
                         <i class="bi bi-pie-chart-fill"></i> Reportes
                     </a>
                 </li>
             {% elif user.usuario.rol == 'cliente' %}
                 <li class="nav-item">
                     <a href="{% url 'usuarios:panel' %}" class="nav-link-custom {% if request.resolver_match.url_name == 'panel' %}active{% endif %}">
-                        <i class="bi bi-speedometer2"></i> Mi Dashboard
+                        <i class="bi bi-speedometer2"></i> Mi Panel
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{% url 'usuarios:crear_pedido' %}" class="nav-link-custom {% if 'crear' in request.path %}active{% endif %}">
+                    <a href="{% url 'usuarios:crear_pedido' %}" class="nav-link-custom {% if request.resolver_match.url_name == 'crear_pedido' %}active{% endif %}">
                         <i class="bi bi-plus-circle-fill"></i> Solicitar Pedido
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{% url 'usuarios:mis_pedidos' %}" class="nav-link-custom {% if 'mis_pedidos' in request.path %}active{% endif %}">
+                    <a href="{% url 'usuarios:mis_pedidos' %}" class="nav-link-custom {% if request.resolver_match.url_name == 'mis_pedidos' %}active{% endif %}">
                         <i class="bi bi-cart-check-fill"></i> Mis Pedidos
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{% url 'usuarios:seguimiento_pedidos' %}" class="nav-link-custom {% if 'seguimiento' in request.path %}active{% endif %}">
+                    <a href="{% url 'usuarios:seguimiento_pedidos' %}" class="nav-link-custom {% if request.resolver_match.url_name == 'seguimiento_pedidos' %}active{% endif %}">
                         <i class="bi bi-geo-alt-fill"></i> Seguimiento
                     </a>
                 </li>
@@ -71,7 +71,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{% url 'usuarios:mis_entregas' %}" class="nav-link-custom {% if 'mis-entregas' in request.path %}active{% endif %}">
+                    <a href="{% url 'usuarios:mis_entregas' %}" class="nav-link-custom {% if request.resolver_match.url_name == 'mis_entregas' %}active{% endif %}">
                         <i class="bi bi-clock-history"></i> Historial
                     </a>
                 </li>

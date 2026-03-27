@@ -25,29 +25,29 @@
                 <div class="row g-4 mb-4">
                     <div class="col-md-6">
                         <label class="form-label">Nombre Completo</label>
-                        <input type="text" name="nombre" class="form-control" placeholder="Ej: Juan Pérez" value="{{ form_data.nombre|default:'' }}" required>
+                        <input type="text" name="nombre" class="form-control rounded-pill border-0 px-4 bg-dark text-white" placeholder="Ej: Juan Pérez" value="{{ form_data.nombre|default:'' }}" required>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">Correo Electrónico (Username)</label>
-                        <input type="email" name="email" class="form-control" placeholder="correo@ejemplo.com" value="{{ form_data.email|default:'' }}" required>
+                        <label class="form-label">Correo Electrónico (Usuario)</label>
+                        <input type="email" name="email" class="form-control rounded-pill border-0 px-4 bg-dark text-white" placeholder="correo@ejemplo.com" value="{{ form_data.email|default:'' }}" required>
                     </div>
                 </div>
 
                 <div class="row g-4 mb-4">
                     <div class="col-md-6">
                         <label class="form-label">Contraseña Temporal</label>
-                        <input type="password" name="password" class="form-control" placeholder="Contraseña segura" required>
+                        <input type="password" name="password" class="form-control rounded-pill border-0 px-4 bg-dark text-white" placeholder="••••••••" required>
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">Teléfono de Contacto</label>
-                        <input type="text" name="telefono" class="form-control" placeholder="3001234567" value="{{ form_data.telefono|default:'' }}" required>
+                        <input type="text" name="telefono" class="form-control rounded-pill border-0 px-4 bg-dark text-white" placeholder="3001234567" value="{{ form_data.telefono|default:'' }}" required>
                     </div>
                 </div>
 
                 <div class="row g-4 mb-5">
                     <div class="col-md-4">
                         <label class="form-label">Rol del Usuario</label>
-                        <select name="rol" class="form-select" required>
+                        <select name="rol" class="form-select rounded-pill border-0 px-4 bg-dark text-white" required>
                             <option value="">Seleccione rol...</option>
                             <option value="cliente" {% if form_data.rol == 'cliente' %}selected{% endif %}>Cliente</option>
                             <option value="conductor" {% if form_data.rol == 'conductor' %}selected{% endif %}>Conductor</option>
@@ -56,7 +56,7 @@
                     </div>
                     <div class="col-md-4">
                         <label class="form-label">Tipo de Documento</label>
-                        <select name="tipo_doc" class="form-select" required>
+                        <select name="tipo_doc" class="form-select rounded-pill border-0 px-4 bg-dark text-white" required>
                             <option value="CC" {% if form_data.tipo_doc == 'CC' %}selected{% endif %}>Cédula Ciudadanía</option>
                             <option value="CE" {% if form_data.tipo_doc == 'CE' %}selected{% endif %}>Cédula Extranjería</option>
                             <option value="NIT" {% if form_data.tipo_doc == 'NIT' %}selected{% endif %}>NIT</option>
@@ -64,7 +64,7 @@
                     </div>
                     <div class="col-md-4">
                         <label class="form-label">Número de Documento</label>
-                        <input type="text" name="documento" class="form-control" placeholder="12345678" value="{{ form_data.documento|default:'' }}" required>
+                        <input type="text" name="documento" class="form-control rounded-pill border-0 px-4 bg-dark text-white" placeholder="12345678" value="{{ form_data.documento|default:'' }}" required>
                     </div>
                 </div>
 

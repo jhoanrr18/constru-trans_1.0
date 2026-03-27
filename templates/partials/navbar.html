@@ -18,7 +18,7 @@
         {% else %}
             <a href="{% url 'usuarios:perfil_cliente' %}" class="profile-link">
         {% endif %}
-            <img src="{{ user.email|gravatar_url:45 }}" class="rounded-circle border-2 border-accent" alt="Profile" width="45" height="45" style="border: 2px solid var(--color-accent) !important;">
+            <img src="{{ user.email|gravatar_url:45 }}" class="rounded-circle border-2 border-accent" alt="Perfil" width="45" height="45" style="border: 2px solid var(--color-accent) !important;">
         </a>
     </div>
 

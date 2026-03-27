@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.utils import timezone
 from .models import Orden, Entrega
 from apps.usuarios.models import Usuario, Vehiculo, Material
 
@@ -95,8 +96,6 @@ def crear_entrega(request, orden_id):
         "conductores": conductores,
         "vehiculos": vehiculos
     })
-
-from django.utils import timezone
 
 @login_required
 def editar_orden(request, orden_id):
