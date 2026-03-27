@@ -14,10 +14,12 @@
 
 
 
-        <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center"
-            style="width:35px; height:35px;">
-            {{ request.user.username|first|upper }}
-        </div>
+        <a href="{% url 'usuarios:perfil_cliente' %}" class="text-decoration-none">
+            <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center"
+                style="width:35px; height:35px;">
+                {{ request.user.username|first|upper }}
+            </div>
+        </a>
 
     </div>
 

@@ -9,9 +9,15 @@
         <form method="POST">
             {% csrf_token %}
 
-            <div class="mb-3">
-                <label class="form-label">Nombre</label>
-                <input type="text" name="nombre" value="{{ usuario.nombre }}" class="form-control rounded-pill">
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">Nombres</label>
+                    <input type="text" name="nombres" value="{{ usuario.nombres }}" class="form-control rounded-pill" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Apellidos</label>
+                    <input type="text" name="apellidos" value="{{ usuario.apellidos }}" class="form-control rounded-pill" required>
+                </div>
             </div>
 
             <div class="mb-3">
@@ -21,11 +27,18 @@
 
             <div class="mb-3">
                 <label class="form-label">Rol</label>
-                <select name="rol" class="form-select rounded-pill">
-                    <option value="admin" {% if usuario.rol == 'admin' %}selected{% endif %}>Administrador</option>
-                    <option value="cliente" {% if usuario.rol == 'cliente' %}selected{% endif %}>Cliente</option>
-                    <option value="conductor" {% if usuario.rol == 'conductor' %}selected{% endif %}>Conductor</option>
-                </select>
+                {% if request.user.usuario.rol == 'admin' %}
+                    <select name="rol" class="form-select rounded-pill">
+                        <option value="admin" {% if usuario.rol == 'admin' %}selected{% endif %}>Administrador</option>
+                        <option value="cliente" {% if usuario.rol == 'cliente' %}selected{% endif %}>Cliente</option>
+                        <option value="conductor" {% if usuario.rol == 'conductor' %}selected{% endif %}>Conductor</option>
+                    </select>
+                {% else %}
+                    <div class="p-2 bg-light border rounded-pill px-3">
+                        <span class="badge bg-primary rounded-pill">{{ usuario.rol|title }}</span>
+                        <input type="hidden" name="rol" value="{{ usuario.rol }}">
+                    </div>
+                {% endif %}
             </div>
 
             <div class="d-grid gap-2 mt-4">

@@ -4,7 +4,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: #0a1428;
+    background-color: #050a14; /* Nueva paleta: Azul Profundo */
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -20,33 +20,29 @@
 
 .loader-img {
     width: 180px;
-    /* Tamaño un poco más moderado */
     height: 180px;
     object-fit: contain;
-    /* Para que el logo no se corte */
     background: white;
-    /* Para que el logo con fondo blanco se vea bien en un círculo */
     border-radius: 50%;
     padding: 20px;
-    /* Espacio para el logo dentro del círculo */
-    border: 4px solid #ffcc00;
+    border: 4px solid #caa030; /* Nueva paleta: Dorado */
     margin-bottom: 30px;
     animation: pulse 2s ease-in-out infinite;
-    box-shadow: 0 0 30px rgba(255, 204, 0, 0.3);
+    box-shadow: 0 0 30px rgba(202, 160, 48, 0.3);
 }
 
 @keyframes pulse {
     0% {
         transform: scale(1);
-        box-shadow: 0 0 20px rgba(255, 204, 0, 0.2);
+        box-shadow: 0 0 20px rgba(202, 160, 48, 0.2);
     }
     50% {
         transform: scale(1.05);
-        box-shadow: 0 0 40px rgba(255, 204, 0, 0.5);
+        box-shadow: 0 0 40px rgba(202, 160, 48, 0.5);
     }
     100% {
         transform: scale(1);
-        box-shadow: 0 0 20px rgba(255, 204, 0, 0.2);
+        box-shadow: 0 0 20px rgba(202, 160, 48, 0.2);
     }
 }
 
@@ -62,7 +58,7 @@
 .progress-bar {
     width: 0%;
     height: 100%;
-    background: linear-gradient(90deg, #ffcc00, #ff9900);
+    background: linear-gradient(90deg, #caa030, #600000); /* Nueva paleta: Dorado a Tinto */
     border-radius: 10px;
     animation: load 2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }

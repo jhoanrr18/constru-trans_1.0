@@ -1,34 +1,273 @@
 {% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-    <title>Inicio de sesión</title>
-    <link rel="shortcut icon" href="{% static 'img/Logo1.jpeg' %}" type="image/x-icon">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Acceso - Constru-trans{% endblock %}</title>
+    
+    <!-- Bootstrap 5 & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    
+    <style>
+        :root {
+            --bg-body: #050a14;
+            --bg-card: #141414;
+            --primary-gold: #caa030;
+            --primary-red: #600000;
+            --text-white: #ffffff;
+            --text-muted: #71717a;
+            --input-border: #27272a;
+            --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-body);
+            background-image: radial-gradient(circle at 0% 0%, rgba(96, 0, 0, 0.1) 0%, transparent 50%),
+                              radial-gradient(circle at 100% 100%, rgba(202, 160, 48, 0.05) 0%, transparent 50%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            padding: 20px;
+            color: var(--text-white);
+        }
+
+        .auth-master-card {
+            width: 100%;
+            max-width: 1100px;
+            background: var(--bg-card);
+            border-radius: 48px;
+            display: flex;
+            position: relative;
+            box-shadow: 0 50px 100px -20px rgba(0, 0, 0, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            min-height: 680px;
+        }
+
+        /* Lado Izquierdo - Formulario */
+        .auth-form-section {
+            flex: 1.2;
+            padding: 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .auth-brand {
+            margin-bottom: 40px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900;
+            font-size: 1.4rem;
+            letter-spacing: -0.5px;
+            text-transform: uppercase;
+        }
+
+        .auth-brand span { color: var(--primary-gold); }
+
+        /* Lado Derecho - Visual */
+        .auth-visual-section {
+            flex: 0.8;
+            background: rgba(255, 255, 255, 0.01);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            border-left: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 0 48px 48px 0;
+        }
+
+        .illustration-wrapper {
+            position: relative;
+            width: 420px;
+            height: 420px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .illustration-circle {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: url('{% static "img/Logo1.jpeg" %}') center/cover;
+            border: 12px solid var(--primary-red);
+            box-shadow: 0 0 80px rgba(96, 0, 0, 0.3);
+            position: relative;
+            z-index: 1;
+            transition: var(--transition);
+        }
+
+        .social-vertical-bar {
+            position: absolute;
+            right: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            z-index: 2;
+        }
+
+        .social-link {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(202, 160, 48, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-gold);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .social-link:hover {
+            background: var(--primary-gold);
+            color: var(--bg-body);
+            transform: translateX(-5px);
+            box-shadow: 0 0 20px rgba(202, 160, 48, 0.3);
+        }
+
+        /* Typography */
+        .welcome-h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900;
+            font-size: 3rem;
+            line-height: 1;
+            margin-bottom: 12px;
+            color: var(--text-white);
+        }
+
+        .welcome-p {
+            color: var(--text-muted);
+            font-size: 1rem;
+            margin-bottom: 48px;
+        }
+
+        .welcome-p a {
+            color: var(--primary-gold);
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        /* Form Elements */
+        .form-group-custom {
+            margin-bottom: 28px;
+        }
+
+        .label-custom {
+            display: block;
+            font-weight: 700;
+            font-size: 0.95rem;
+            margin-bottom: 12px;
+            color: var(--text-white);
+        }
+
+        .input-custom {
+            width: 100%;
+            background: transparent !important;
+            border: 2px solid var(--input-border) !important;
+            border-radius: 100px !important;
+            padding: 16px 32px !important;
+            color: white !important;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .input-custom:focus {
+            border-color: var(--primary-gold) !important;
+            box-shadow: 0 0 20px rgba(202, 160, 48, 0.1) !important;
+            outline: none;
+        }
+
+        .btn-main {
+            width: 100%;
+            background: var(--primary-gold);
+            color: #000;
+            border: none;
+            padding: 18px;
+            border-radius: 100px;
+            font-weight: 800;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: var(--transition);
+            margin-top: 20px;
+        }
+
+        .btn-main:hover {
+            background: #e2b33c;
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(202, 160, 48, 0.3);
+        }
+
+        /* Logo Branding Superior */
+        .brand-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            margin-right: 12px;
+            object-fit: cover;
+        }
+
+        /* Alerts */
+        .alert-custom {
+            background: rgba(96, 0, 0, 0.15);
+            border: 1px solid var(--primary-red);
+            color: #ffbaba;
+            border-radius: 20px;
+            padding: 16px 24px;
+            margin-bottom: 32px;
+            font-weight: 500;
+        }
+
+        @media (max-width: 992px) {
+            .auth-visual-section { display: none; }
+            .auth-master-card { border-radius: 32px; min-height: auto; }
+            .auth-form-section { padding: 60px 32px; }
+            .welcome-h1 { font-size: 2.2rem; }
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
 </head>
 <body>
 
-<div style="text-align: center; margin-top: 20px;">
-    <img src="{% static 'img/Logo1.jpeg' %}" width="200" alt="Logo">
-    <h2>Iniciar sesión</h2>
-</div>
+    <div class="auth-master-card animate__animated animate__fadeIn">
+        <div class="auth-form-section">
+            <div class="auth-brand d-flex align-items-center">
+                <img src="{% static 'img/Logo1.jpeg' %}" alt="Logo" class="brand-icon">
+                CONSTRU<span>-TRANS</span>
+            </div>
+            
+            {% block content %}
+            {% endblock %}
+        </div>
 
-<form method="POST">
-    {% csrf_token %}
+        <div class="auth-visual-section">
+            <div class="social-vertical-bar">
+                <a href="#" class="social-link"><i class="bi bi-twitter-x"></i></a>
+                <a href="#" class="social-link"><i class="bi bi-instagram"></i></a>
+                <a href="#" class="social-link"><i class="bi bi-facebook"></i></a>
+                <a href="#" class="social-link"><i class="bi bi-linkedin"></i></a>
+            </div>
 
-    <label>Usuario</label>
-    <input type="text" name="username" required>
+            <div class="illustration-wrapper">
+                <div class="illustration-circle animate__animated animate__zoomIn"></div>
+            </div>
+        </div>
+    </div>
 
-    <br><br>
-
-    <label>Contraseña</label>
-    <input type="password" name="password" required>
-
-    <br><br>
-
-    <button type="submit">Ingresar</button>
-</form>
-
-<a href="{% url 'inicio' %}">Volver al inicio</a>
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    {% block extra_js %}{% endblock %}
 </body>
 </html>

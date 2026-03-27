@@ -23,7 +23,7 @@ def crear_orden(request):
         fecha_entrega = request.POST.get("fecha_entrega")
 
         if not material_id or not cantidad_str or not direccion or not fecha_entrega:
-            return render(request, "cliente/crear_pedido.html", {
+            return render(request, "clientes/crear_pedido.html", {
                 "materiales": materiales,
                 "error": "Por favor, completa todos los campos."
             })
@@ -47,12 +47,12 @@ def crear_orden(request):
             return redirect("usuarios:mis_pedidos")
 
         except Exception as e:
-            return render(request, "cliente/crear_pedido.html", {
+            return render(request, "clientes/crear_pedido.html", {
                 "materiales": materiales,
                 "error": f"Error interno: {e}"
             })
 
-    return render(request, "cliente/crear_pedido.html", {
+    return render(request, "clientes/crear_pedido.html", {
         "materiales": materiales
     })
 
@@ -113,7 +113,7 @@ def editar_orden(request, orden_id):
         orden.estado = nuevo_estado
         orden.save()
         return redirect("ordenes:lista_ordenes")
-    return render(request, "dashboard/pedido_detalle.html", {"pedido": orden})
+    return render(request, "dashboard/pedido_detalle.html", {"orden": orden})
 
 @login_required
 def eliminar_orden(request, orden_id):

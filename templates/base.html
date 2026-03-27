@@ -9,9 +9,41 @@
 <title>{% block title %}Panel Administrador{% endblock %}</title>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-<link rel="stylesheet" href="{% static 'css/loader.css' %}">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
 <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+<link rel="stylesheet" href="{% static 'css/loader.css' %}">
+
+<style>
+    :root {
+        --color-primary: #600000;
+        --color-secondary: #050a14;
+        --color-accent: #caa030;
+        --color-dark: #1e1e1e;
+        --color-surface: #141414;
+        --color-border: #27272a;
+        --color-text: #ffffff;
+        --color-muted: #a1a1aa;
+        --color-bg: #050a14;
+    }
+
+    body {
+        background-color: var(--color-secondary);
+        color: var(--color-text);
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        margin: 0;
+    }
+
+    main {
+        background-color: var(--color-secondary) !important; /* Forzar fondo oscuro */
+        position: relative;
+        z-index: 1;
+    }
+
+    .container-fluid {
+        background-color: var(--color-secondary);
+    }
+</style>
 
 </head>
 
@@ -30,9 +62,22 @@
 
 {% include "partials/sidebar.html" %}
 
-<main class="flex-grow-1 bg-light p-4 overflow-auto">
+<main class="flex-grow-1 p-4 overflow-auto" style="min-height: 100vh;">
 
 {% include "partials/navbar.html" %}
+
+{% if messages %}
+    <div class="container-fluid mt-3">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show rounded-pill px-4" role="alert">
+                {% if message.tags == 'success' %}<i class="bi bi-check-circle-fill me-2"></i>{% endif %}
+                {% if message.tags == 'error' %}<i class="bi bi-exclamation-triangle-fill me-2"></i>{% endif %}
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
 
 {% block content %}
 {% endblock %}
@@ -42,8 +87,23 @@
 </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
 <script src="{% static 'java/loader.js' %}"></script>
+
+<script>
+$(document).ready(function() {
+    $('.table:not(.no-datatable)').DataTable({
+        "language": {
+            "url": "//cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json"
+        },
+        "pageLength": 10,
+        "responsive": true
+    });
+});
+</script>
 
 </body>
 </html>

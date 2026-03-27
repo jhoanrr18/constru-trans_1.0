@@ -12,7 +12,7 @@
         <select name="cliente" class="form-control" required>
             {% for cliente in clientes %}
             <option value="{{cliente.id}}" {% if orden.cliente_id == cliente.id %}selected{% endif %}>
-                {{cliente.nombre}}
+                {{cliente}}
             </option>
             {% endfor %}
         </select>
@@ -24,7 +24,7 @@
             <option value="">Seleccione un conductor</option>
             {% for conductor in conductores %}
             <option value="{{conductor.id}}" {% if orden.conductor_id == conductor.id %}selected{% endif %}>
-                {{conductor.nombre}}
+                {{conductor}}
             </option>
             {% endfor %}
         </select>

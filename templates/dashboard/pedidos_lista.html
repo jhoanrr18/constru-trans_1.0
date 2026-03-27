@@ -4,8 +4,30 @@
 
 {% block content %}
 
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
     <h2 class="fw-bold mb-0">Gestión de Pedidos</h2>
+    
+    <!-- Filtros -->
+    <form method="GET" class="d-flex gap-2">
+        <div class="input-group">
+            <span class="input-group-text bg-white border-end-0 small"><i class="bi bi-person text-muted"></i></span>
+            <input type="text" name="cliente" class="form-control border-start-0 ps-0 form-control-sm" 
+                   placeholder="Cliente..." value="{{ request.GET.cliente }}">
+        </div>
+        <div class="input-group">
+            <span class="input-group-text bg-white border-end-0 small"><i class="bi bi-calendar-event text-muted"></i></span>
+            <input type="date" name="fecha" class="form-control border-start-0 ps-0 form-control-sm" 
+                   value="{{ request.GET.fecha }}">
+        </div>
+        <button type="submit" class="btn btn-primary btn-sm rounded-pill px-3">
+            <i class="bi bi-filter"></i>
+        </button>
+        {% if request.GET.cliente or request.GET.fecha %}
+            <a href="{% url 'usuarios:lista_pedidos_admin' %}" class="btn btn-light btn-sm rounded-pill px-3">
+                <i class="bi bi-x-circle"></i>
+            </a>
+        {% endif %}
+    </form>
 </div>
 
 <div class="table-container">
@@ -24,7 +46,7 @@
             {% for pedido in pedidos %}
             <tr>
                 <td class="text-center text-muted fw-bold">#CT-{{ pedido.id }}</td>
-                <td class="fw-bold">{{ pedido.cliente.nombre }}</td>
+                <td class="fw-bold">{{ pedido.cliente }}</td>
                 <td class="text-center">{{ pedido.fecha|date:"d/m/Y H:i" }}</td>
                 <td class="text-center"><span class="price-tag">$ {{ pedido.price|default:pedido.precio }}</span></td>
                 <td class="text-center">

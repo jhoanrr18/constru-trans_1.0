@@ -35,11 +35,13 @@ class Orden(models.Model):
     PENDIENTE = "pendiente"
     EN_RUTA = "en_ruta"
     ENTREGADO = "entregado"
+    CANCELADO = "cancelado"
 
     ESTADOS = [
         (PENDIENTE, "Pendiente"),
         (EN_RUTA, "En Ruta"),
         (ENTREGADO, "Entregado"),
+        (CANCELADO, "Cancelado"),
     ]
 
     estado = models.CharField(
@@ -59,6 +61,26 @@ class Orden(models.Model):
 
     def __str__(self):
         return f"Orden {self.id} - {self.estado}"
+
+
+class DetalleOrden(models.Model):
+    orden = models.ForeignKey(
+        Orden,
+        on_delete=models.CASCADE,
+        related_name="detalles"
+    )
+    material = models.ForeignKey(
+        Material,
+        on_delete=models.CASCADE
+    )
+    cantidad = models.IntegerField(default=1)
+    precio_unitario = models.DecimalField(
+        max_digits=10,
+        decimal_places=2
+    )
+
+    def __str__(self):
+        return f"{self.cantidad} x {self.material.nombre} (Orden {self.orden.id})"
 
 
 class Entrega(models.Model):

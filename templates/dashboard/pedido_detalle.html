@@ -1,93 +1,148 @@
 {% extends "base.html" %}
 
+{% block title %}Detalle del Pedido - Constru-trans{% endblock %}
+
+{% block header_title %}Información del Pedido #CT-{{ orden.id }}{% endblock %}
+
 {% block content %}
 
-<div class="form-container-centered">
-    <div class="card card-form p-4">
-        <h2 class="text-center mb-4">Detalle del Pedido</h2>
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="table-container p-4 p-md-5">
+            <div class="d-flex justify-content-between align-items-center mb-5 pb-3 border-bottom border-secondary">
+                <div>
+                    <h3 class="fw-800 text-white mb-1">Orden de Entrega</h3>
+                    <p class="text-muted small mb-0">Referencia: #CT-{{ orden.id }}</p>
+                </div>
+                <div class="text-end">
+                    {% if orden.estado == "pendiente" %}
+                    <span class="badge-tipo" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b; border-color: rgba(245, 158, 11, 0.2);">Pendiente</span>
+                    {% elif orden.estado == "en_ruta" %}
+                    <span class="badge-tipo" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6; border-color: rgba(59, 130, 246, 0.2);">En ruta</span>
+                    {% elif orden.estado == "entregado" %}
+                    <span class="badge-tipo" style="background: rgba(34, 197, 94, 0.1); color: #22c55e; border-color: rgba(34, 197, 94, 0.2);">Entregado</span>
+                    {% endif %}
+                </div>
+            </div>
 
-        <div class="mb-4">
-            <div class="d-flex justify-content-between mb-2">
-                <span class="text-muted">ID Pedido:</span>
-                <span class="fw-bold">#CT-{{ pedido.id }}</span>
+            <div class="row g-5">
+                <!-- Columna Izquierda: Información -->
+                <div class="col-md-6">
+                    <div class="mb-5">
+                        <h6 class="fw-800 text-accent text-uppercase small mb-3" style="letter-spacing: 1px;">Datos del Cliente</h6>
+                        <div class="d-flex align-items-center p-3 rounded-4" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);">
+                            <div class="bg-accent rounded-circle p-3 me-3" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;">
+                                <i class="bi bi-person-fill text-dark fs-4"></i>
+                            </div>
+                            <div>
+                                <h5 class="fw-700 text-white mb-0">{{ orden.cliente.nombres }} {{ orden.cliente.apellidos }}</h5>
+                                <p class="text-muted small mb-0">{{ orden.cliente.user.email }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-5">
+                        <h6 class="fw-800 text-accent text-uppercase small mb-3" style="letter-spacing: 1px;">Logística de Entrega</h6>
+                        <div class="space-y-4">
+                            <div class="d-flex gap-3">
+                                <div class="text-accent fs-4"><i class="bi bi-geo-alt"></i></div>
+                                <div>
+                                    <p class="text-muted small mb-0">Dirección de Origen</p>
+                                    <p class="text-white fw-600 mb-0">{{ orden.direccion_origen }}</p>
+                                </div>
+                            </div>
+                            <div class="d-flex gap-3">
+                                <div class="text-accent fs-4"><i class="bi bi-geo-fill"></i></div>
+                                <div>
+                                    <p class="text-muted small mb-0">Dirección de Destino</p>
+                                    <p class="text-white fw-600 mb-0">{{ orden.direccion_destino }}</p>
+                                </div>
+                            </div>
+                            <div class="d-flex gap-3">
+                                <div class="text-accent fs-4"><i class="bi bi-calendar-check"></i></div>
+                                <div>
+                                    <p class="text-muted small mb-0">Fecha Programada</p>
+                                    <p class="text-white fw-600 mb-0">{{ orden.fecha|date:"d M, Y" }} - {{ orden.fecha_entrega_programada|date:"H:i"|default:"Pendiente" }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Columna Derecha: Materiales y Pago -->
+                <div class="col-md-6">
+                    <div class="mb-5">
+                        <h6 class="fw-800 text-accent text-uppercase small mb-3" style="letter-spacing: 1px;">Resumen de Materiales</h6>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle no-datatable">
+                                <thead>
+                                    <tr class="text-muted small border-bottom border-secondary">
+                                        <th class="ps-0">Material</th>
+                                        <th class="text-center">Cant.</th>
+                                        <th class="text-end pe-0">Subtotal</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for detalle in orden.detalles.all %}
+                                    <tr>
+                                        <td class="ps-0 text-white fw-600">{{ detalle.material.nombre }}</td>
+                                        <td class="text-center text-muted">{{ detalle.cantidad }}</td>
+                                        <td class="text-end pe-0 text-accent fw-700">$ {{ detalle.precio_unitario }}</td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="3" class="text-center py-4 text-muted">No hay detalles registrados.</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="2" class="ps-0 pt-4 text-muted fw-700">Total de la Orden</td>
+                                        <td class="pe-0 pt-4 text-end"><h3 class="fw-900 text-white mb-0">$ {{ orden.precio }}</h3></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+
+                    {% if user.usuario.rol == "admin" or user.usuario.rol == "conductor" %}
+                    <div class="p-4 rounded-4" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);">
+                        <h6 class="fw-800 text-accent text-uppercase small mb-3" style="letter-spacing: 1px;">Gestión de Estado</h6>
+                        <form method="POST">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <select name="estado" class="form-select rounded-pill border-0 px-4">
+                                    <option value="pendiente" {% if orden.estado == 'pendiente' %}selected{% endif %}>Pendiente</option>
+                                    <option value="en_ruta" {% if orden.estado == 'en_ruta' %}selected{% endif %}>En Ruta</option>
+                                    <option value="entregado" {% if orden.estado == 'entregado' %}selected{% endif %}>Entregado</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-gold w-100 rounded-pill py-2 fw-800">Actualizar Estado</button>
+                        </form>
+                    </div>
+                    {% endif %}
+                </div>
             </div>
-            <div class="d-flex justify-content-between mb-2">
-                <span class="text-muted">Cliente:</span>
-                <span class="fw-bold">{{ pedido.cliente.nombre }}</span>
-            </div>
-            <div class="d-flex justify-content-between mb-2">
-                <span class="text-muted">Fecha Creación:</span>
-                <span>{{ pedido.fecha|date:"d/m/Y H:i" }}</span>
-            </div>
-            <div class="d-flex justify-content-between mb-2">
-                <span class="text-muted">Fecha Programada:</span>
-                <span class="fw-bold text-primary">{{ pedido.fecha_entrega_programada|date:"d/m/Y H:i"|default:"No programada" }}</span>
-            </div>
-            {% if pedido.fecha_toma_entrega %}
-            <div class="d-flex justify-content-between mb-2">
-                <span class="text-muted">Toma de Entrega (En Ruta):</span>
-                <span class="text-info small">{{ pedido.fecha_toma_entrega|date:"d/m/Y H:i" }}</span>
-            </div>
-            {% endif %}
-            {% if pedido.fecha_entrega_real %}
-            <div class="d-flex justify-content-between mb-2">
-                <span class="text-muted">Entrega Realizada:</span>
-                <span class="text-success small fw-bold">{{ pedido.fecha_entrega_real|date:"d/m/Y H:i" }}</span>
-            </div>
-            {% endif %}
-            <hr>
-            <div class="mb-2">
-                <span class="text-muted d-block small">Origen:</span>
-                <span class="fw-medium">{{ pedido.direccion_origen }}</span>
-            </div>
-            <div class="mb-2">
-                <span class="text-muted d-block small">Destino:</span>
-                <span class="fw-medium">{{ pedido.direccion_destino }}</span>
-            </div>
-            <hr>
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <span class="text-muted">Total:</span>
-                <span class="price-tag fs-5">$ {{ pedido.precio }}</span>
-            </div>
-            <div class="d-flex justify-content-between align-items-center">
-                <span class="text-muted">Estado Actual:</span>
-                <span class="badge {% if pedido.estado == 'pendiente' %}bg-warning{% elif pedido.estado == 'entregado' %}bg-success{% else %}bg-info{% endif %} rounded-pill px-3">
-                    {{ pedido.estado|title }}
-                </span>
+
+            <div class="mt-5 pt-4 border-top border-secondary d-flex justify-content-between align-items-center">
+                <a href="javascript:history.back()" class="btn btn-outline-light rounded-pill px-4">
+                    <i class="bi bi-arrow-left me-2"></i> Volver
+                </a>
+                <button class="btn btn-outline-light rounded-pill px-4" onclick="window.print()">
+                    <i class="bi bi-printer me-2"></i> Imprimir Comprobante
+                </button>
             </div>
         </div>
-
-        <form method="POST" class="bg-light p-3 rounded-4 mb-4">
-            {% csrf_token %}
-            <div class="mb-3">
-                <label for="estado" class="form-label fw-bold small">Actualizar Estado</label>
-                <select name="estado" id="estado" class="form-select rounded-pill">
-                    <option value="pendiente" {% if pedido.estado == 'pendiente' %}selected{% endif %}>Pendiente</option>
-                    <option value="en_ruta" {% if pedido.estado == 'en_ruta' %}selected{% endif %}>En Ruta</option>
-                    <option value="entregado" {% if pedido.estado == 'entregado' %}selected{% endif %}>Entregado</option>
-                </select>
-            </div>
-            <button type="submit" class="btn btn-primary w-100 rounded-pill">Actualizar</button>
-        </form>
-
-        <div class="mb-4">
-            <h6 class="fw-bold mb-2">Conductor Asignado</h6>
-            {% if pedido.conductor %}
-                <div class="d-flex align-items-center gap-2">
-                    <i class="bi bi-person-badge fs-4 text-primary"></i>
-                    <span>{{ pedido.conductor.nombre }}</span>
-                </div>
-            {% else %}
-                <div class="alert alert-warning py-2 small mb-0">
-                    <i class="bi bi-exclamation-circle me-2"></i> No hay conductor asignado
-                </div>
-            {% endif %}
-        </div>
-
-        <a href="{% url 'ordenes:lista_ordenes' %}" class="btn btn-light w-100 rounded-pill">
-            <i class="bi bi-arrow-left me-2"></i> Volver a la lista
-        </a>
     </div>
 </div>
+
+<style>
+    .fw-900 { font-weight: 900; }
+    .fw-800 { font-weight: 800; }
+    .fw-700 { font-weight: 700; }
+    .fw-600 { font-weight: 600; }
+    .text-accent { color: var(--color-accent) !important; }
+    .space-y-4 > * + * { margin-top: 1.5rem; }
+</style>
 
 {% endblock %}

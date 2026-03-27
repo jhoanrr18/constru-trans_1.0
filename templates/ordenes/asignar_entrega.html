@@ -24,7 +24,7 @@
                 <select name="conductor" class="form-select rounded-pill" required>
                     <option value="">Seleccione un conductor</option>
                     {% for c in conductores %}
-                    <option value="{{ c.id }}">{{ c.nombre }}</option>
+                    <option value="{{ c.id }}">{{ c }}</option>
                     {% endfor %}
                 </select>
             </div>

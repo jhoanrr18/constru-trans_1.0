@@ -1,4 +1,4 @@
-{% extends "cliente/base_cliente.html" %}
+{% extends "clientes/base_cliente.html" %}
 
 {% block content %}
 
@@ -17,7 +17,7 @@
 <select name="conductor" required>
     <option value="">Seleccionar conductor</option>
     {% for c in conductores %}
-        <option value="{{ c.id }}">{{ c.nombre }}</option>
+        <option value="{{ c.id }}">{{ c }}</option>
     {% endfor %}
 </select>
 

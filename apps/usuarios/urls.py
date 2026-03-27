@@ -17,19 +17,23 @@ urlpatterns = [
     path("usuarios/crear/", views.crear_usuario, name="crear_usuario"),
     path("usuarios/eliminar/<int:id>/", views.eliminar_usuario, name="eliminar_usuario"),
     path("usuarios/editar/<int:id>/", views.editar_usuario, name="editar_usuario"),
+    path("perfil-admin/", views.perfil_admin, name="perfil_admin"),
 
     path("conductores/", views.lista_conductores, name="lista_conductores"),
     path("vehiculos/", views.lista_vehiculos, name="lista_vehiculos"),
     path("vehiculos/crear/", views.crear_vehiculo, name="crear_vehiculo"),
 
+    path("pedido-detalle/<int:id>/", views.pedido_detalle, name="pedido_detalle"),
+
     path("reportes/", views.reportes_admin, name="reportes_admin"),
 
     # cliente
-    path("cliente/", views.panel_cliente, name="panel_cliente"),
+    path("panel-cliente/", views.panel_cliente, name="panel_cliente"),
     path("perfil/", views.perfil_cliente, name="perfil_cliente"),
 
     # pedidos cliente
     path("pedido/crear/", views.crear_pedido, name="crear_pedido"),
+    path("pedido/editar/<int:id>/", views.editar_pedido, name="editar_pedido"),
     path("mis-pedidos/", views.mis_pedidos, name="mis_pedidos"),
     path("seguimiento/", views.seguimiento_pedidos, name="seguimiento_pedidos"),
     path("historial/", views.historial_pedidos, name="historial_pedidos"),
@@ -50,11 +54,13 @@ urlpatterns = [
 
     path("orden/eliminar/<int:id>/", views.eliminar_orden, name="eliminar_orden"),
 
-    # recuperar contraseña
+    # recuperar contraseña (HU-01)
     path(
         "recuperar/",
-        auth_views.PasswordResetView.as_view(
-            template_name="usuarios/recuperar_password.html"
+        views.CustomPasswordResetView.as_view(
+            template_name="usuarios/recuperar_password.html",
+            email_template_name="registration/password_reset_email.html",
+            success_url="/usuarios/recuperar/enviado/"
         ),
         name="password_reset"
     ),
@@ -70,7 +76,8 @@ urlpatterns = [
     path(
         "recuperar/<uidb64>/<token>/",
         auth_views.PasswordResetConfirmView.as_view(
-            template_name="usuarios/password_confirmar.html"
+            template_name="usuarios/password_confirmar.html",
+            success_url="/usuarios/recuperar/completo/"
         ),
         name="password_reset_confirm"
     ),

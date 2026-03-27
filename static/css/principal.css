@@ -1,19 +1,19 @@
 :root {
-    --color-primary: #0056B3;
-    --color-secondary: #38517C;
-    --color-accent: #F39C12;
-    --color-dark: #111827;
-    --color-neutral-800: #333333;
-    --color-bg: #FFFFFF;
-    --color-text: #333333;
-    --color-gold: #FFF7E6;
-    --color-muted: #6B7280;
-    --color-surface: #F8FAFC;
-    --color-border: #E5E7EB;
-    --color-success: #16A34A;
-    --color-warning: #F59E0B;
-    --color-danger: #DC2626;
-    --color-info: #0EA5E9
+    --color-primary: #600000; /* Deep Red / Bordeaux */
+    --color-secondary: #050a14; /* Dark Blue / Navy */
+    --color-accent: #caa030; /* Gold */
+    --color-dark: #1e1e1e; /* Dark Gray */
+    --color-neutral-800: #27272a;
+    --color-bg: #ffffff; /* CAMBIADO A BLANCO */
+    --color-text: #1a1a1a; /* CAMBIADO A NEGRO/GRIS OSCURO */
+    --color-gold: #caa030;
+    --color-muted: #64748b;
+    --color-surface: #f8fafc; /* Fondo suave para tarjetas */
+    --color-border: #e2e8f0;
+    --color-success: #22c55e;
+    --color-warning: #f59e0b;
+    --color-danger: #ef4444;
+    --color-info: #3b82f6
 }
 
 * {
@@ -52,7 +52,8 @@ a:hover {
 }
 
 .color-principal-fn {
-    color: var(--color-primary)!important
+    color: var(--color-accent)!important; /* Cambiado a dorado para legibilidad */
+    font-weight: 800;
 }
 
 /* Hero Section */
@@ -102,20 +103,25 @@ a:hover {
 /* Cards & Sections */
 .card-soft {
     border: 1px solid var(--color-border);
-    border-radius: 1rem;
-    box-shadow: 0 6px 24px rgba(0, 0, 0, .06)
+    border-radius: 1.5rem;
+    background: var(--color-surface);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, .05); /* Sombra más suave sobre blanco */
+    padding: 2rem;
 }
 
 .transition-card {
-    transition: transform .3s ease
+    transition: all .4s cubic-bezier(0.4, 0, 0.2, 1)
 }
 
 .transition-card:hover {
-    transform: translateY(-10px)
+    transform: translateY(-10px);
+    border-color: var(--color-accent);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, .1);
 }
 
 .icon-xl {
-    font-size: 2.25rem
+    font-size: 2.5rem;
+    color: var(--color-accent);
 }
 
 .fondo-blanco {
@@ -123,17 +129,20 @@ a:hover {
 }
 
 .color-oscuro-fn {
-    color: var(--color-neutral-800)!important
+    color: #000000 !important; /* Forzado a negro */
 }
 
 .color-dorado-bg {
-    background-color: var(--color-gold)!important
+    background-color: var(--color-accent)!important;
+    color: #000 !important;
 }
 
 /* Mission & Lists */
 .img-mision {
     max-width: 600px;
-    width: 100%
+    width: 100%;
+    border-radius: 2rem;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.3);
 }
 
 .list-check {
@@ -146,42 +155,60 @@ a:hover {
     display: flex;
     align-items: flex-start;
     gap: .5rem;
-    margin-bottom: .25rem
+    margin-bottom: .75rem;
+    color: var(--color-text);
 }
 
 .list-check li::before {
     content: "✓";
-    color: var(--color-primary);
-    font-weight: 700
+    color: var(--color-accent);
+    font-weight: 900
 }
 
 /* Steps */
 .step-number {
-    width: 48px;
-    height: 48px;
+    width: 56px;
+    height: 56px;
     border-radius: 50%;
     background-color: var(--color-accent);
-    color: #fff;
+    color: #000;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: 700
+    font-weight: 800;
+    font-size: 1.25rem;
+    box-shadow: 0 0 20px rgba(202, 160, 48, 0.3);
 }
 
 /* CTA Band */
 .cta-band {
-    background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
-    color: #fff;
-    border-radius: 16px;
-    padding: 32px
+    background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+    color: #ffffff; /* Texto blanco en la banda oscura */
+    border-radius: 24px;
+    padding: 48px;
+    border: 1px solid rgba(255,255,255,0.05);
 }
 
 .cta-band .btn-light {
-    color: var(--color-primary)
+    background: var(--color-accent);
+    border: none;
+    color: #000;
+    font-weight: 800;
+}
+
+.cta-band p, .cta-band h2 {
+    color: #ffffff !important;
 }
 
 /* Footer */
 footer {
-    background-color: var(--color-dark);
-    color: #fff
+    background-color: #03070d;
+    color: var(--color-muted);
+    border-top: 1px solid var(--color-border);
 }
+
+footer h5 {
+    color: #ffffff;
+    font-weight: 800;
+}
+

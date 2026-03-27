@@ -10,18 +10,20 @@ from django.db.models import Sum, Q
 from django.utils.timezone import now
 from django.contrib import messages
 from django.http import JsonResponse
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 
 # ---------------- REGISTRO ----------------
 def registro(request):
     if request.method == "POST":
-        nombre = request.POST.get("nombre")
+        nombres = request.POST.get("nombres")
+        apellidos = request.POST.get("apellidos")
         username = request.POST.get("usuario")
         email = request.POST.get("correo")
         telefono = request.POST.get("telefono")
         tipo_documento = request.POST.get("tipo_documento")
         documento = request.POST.get("documento")
-        rol = request.POST.get("rol")
+        rol = "cliente" # Rol predeterminado (HU-01)
         password = request.POST.get("contrasena")
         confirmar = request.POST.get("confirmar_contrasena")
 
@@ -48,7 +50,8 @@ def registro(request):
 
         Usuario.objects.create(
             user=user,
-            nombre=nombre,
+            nombres=nombres,
+            apellidos=apellidos,
             telefono=telefono,
             rol=rol,
             tipo_documento=tipo_documento,
@@ -60,6 +63,9 @@ def registro(request):
     return render(request, "usuarios/registro.html")
 
 
+from django.contrib.auth import views as auth_views
+
+# ---------------- LOGIN ----------------
 def login_usuario(request):
     if request.method == "POST":
         identifier = request.POST.get("username")
@@ -83,7 +89,7 @@ def login_usuario(request):
             if user.is_superuser:
                 Usuario.objects.get_or_create(
                     user=user,
-                    defaults={'nombre': user.username, 'rol': 'admin'}
+                    defaults={'nombres': user.username, 'apellidos': '', 'rol': 'admin'}
                 )
                 return redirect("usuarios:panel")
 
@@ -120,7 +126,8 @@ def panel(request):
         if request.user.is_superuser:
             usuario = Usuario.objects.create(
                 user=request.user,
-                nombre=request.user.username,
+                nombres=request.user.username,
+                apellidos='',
                 rol='admin',
                 estado='activo'
             )
@@ -140,6 +147,11 @@ def panel(request):
             "pedidos_recientes": Orden.objects.all().order_by("-fecha")[:5]
         }
         return render(request, "dashboard/panel-admin.html", context)
+    elif usuario.rol == "cliente":
+        return panel_cliente(request)
+    elif usuario.rol == "conductor":
+        return panel_conductor(request)
+    
     return redirect("usuarios:login")
 
 
@@ -152,10 +164,16 @@ def panel_conductor(request):
         logout(request)
         return redirect("usuarios:login")
         
-    pedidos = Orden.objects.filter(conductor=conductor)
-    return render(request, "usuarios/panel-conductor.html", {
-        "pedidos": pedidos
-    })
+    pedidos_asignados = Orden.objects.filter(conductor=conductor).exclude(estado="entregado")
+    entregas_completadas = Orden.objects.filter(conductor=conductor, estado="entregado")
+    
+    context = {
+        "pedidos": pedidos_asignados,
+        "entregas_totales": entregas_completadas.count(),
+        "pedidos_pendientes": pedidos_asignados.count(),
+        "ultima_entrega": entregas_completadas.order_by("-fecha").first()
+    }
+    return render(request, "usuarios/panel-conductor.html", context)
 
 
 @login_required
@@ -197,7 +215,7 @@ def panel_cliente(request):
         "total_gastado": pedidos.aggregate(total=Sum("precio"))["total"] or 0,
         "ultimos_pedidos": pedidos.order_by("-fecha")[:5]
     }
-    return render(request, "cliente/dashboard.html", context)
+    return render(request, "clientes/dashboard.html", context)
 
 
 @login_required
@@ -206,24 +224,51 @@ def mis_pedidos(request):
     pedidos = Orden.objects.filter(
         cliente=cliente
     ).order_by("-fecha")
-    return render(request, "cliente/mis_pedidos.html", {
+    return render(request, "clientes/mis_pedidos.html", {
         "pedidos": pedidos
     })
 
 
 @login_required
+def perfil_admin(request):
+    usuario = request.user.usuario
+    context = {
+        "usuario": usuario,
+        "usuarios_count": Usuario.objects.count(),
+        "materiales_count": Material.objects.count(),
+        "ordenes_count": Orden.objects.count(),
+        "total_ventas": Orden.objects.aggregate(total=Sum("precio"))["total"] or 0,
+        "entregados_count": Orden.objects.filter(estado="entregado").count()
+    }
+    return render(request, "dashboard/perfil.html", context)
+
+
+@login_required
 def perfil_cliente(request):
-    cliente = request.user.usuario
-    return render(request, "cliente/perfil.html", {
-        "cliente": cliente
-    })
+    try:
+        cliente = request.user.usuario
+    except Usuario.DoesNotExist:
+        logout(request)
+        return redirect("usuarios:login")
+        
+    pedidos = Orden.objects.filter(cliente=cliente)
+    
+    context = {
+        "cliente": cliente,
+        "total_pedidos": pedidos.count(),
+        "pedidos_pendientes": pedidos.filter(estado="pendiente").count(),
+        "en_ruta": pedidos.filter(estado="en_ruta").count(),
+        "total_invertido": pedidos.aggregate(total=Sum("precio"))["total"] or 0
+    }
+    
+    return render(request, "clientes/perfil.html", context)
 
 
 @login_required
 def seguimiento_pedidos(request):
     cliente = request.user.usuario
     pedidos = Orden.objects.filter(cliente=cliente).order_by("-fecha")
-    return render(request, "cliente/seguimiento.html", {
+    return render(request, "clientes/seguimiento.html", {
         "pedidos": pedidos
     })
 
@@ -235,7 +280,7 @@ def historial_pedidos(request):
         cliente=cliente, 
         estado="entregado"
     ).order_by("-fecha")
-    return render(request, "cliente/historial.html", {
+    return render(request, "clientes/historial.html", {
         "pedidos": pedidos
     })
 
@@ -244,7 +289,7 @@ def historial_pedidos(request):
 @login_required
 def crear_usuario(request):
     if request.method == "POST":
-        nombre = request.POST.get("nombre")
+        nombre_completo = request.POST.get("nombre")
         email = request.POST.get("email")
         password = request.POST.get("password")
         telefono = request.POST.get("telefono")
@@ -252,37 +297,74 @@ def crear_usuario(request):
         tipo_doc = request.POST.get("tipo_doc")
         documento = request.POST.get("documento")
 
-        # Crear User de Django
-        user = User.objects.create_user(
-            username=email,
-            email=email,
-            password=password
-        )
+        # Dividir nombre completo en nombres y apellidos
+        partes = nombre_completo.split(' ', 1)
+        nombres = partes[0]
+        apellidos = partes[1] if len(partes) > 1 else ''
 
-        # Crear Perfil Usuario
-        Usuario.objects.create(
-            user=user,
-            nombre=nombre,
-            telefono=telefono,
-            rol=rol,
-            tipo_documento=tipo_doc,
-            documento=documento
-        )
+        try:
+            # Crear User de Django
+            user = User.objects.create_user(
+                username=email,
+                email=email,
+                password=password
+            )
 
-        return redirect("usuarios:lista_usuarios")
+            # Crear Perfil Usuario
+            Usuario.objects.create(
+                user=user,
+                nombres=nombres,
+                apellidos=apellidos,
+                telefono=telefono,
+                rol=rol,
+                tipo_documento=tipo_doc,
+                documento=documento,
+                estado='activo'
+            )
+            messages.success(request, f"Usuario {nombres} creado correctamente.")
+            return redirect("usuarios:lista_usuarios")
+        except Exception as e:
+            messages.error(request, f"Error al crear usuario: {e}")
+            return render(request, "dashboard/usuario_form.html", {
+                "error": str(e),
+                "form_data": request.POST
+            })
 
-    return redirect("usuarios:lista_usuarios")
+    return render(request, "dashboard/usuario_form.html")
 
 @login_required
 def lista_usuarios(request):
-    usuarios = Usuario.objects.filter(rol='cliente')
-    return render(request, "dashboard/usuarios_lista.html", {"usuarios": usuarios})
+    usuarios_list = Usuario.objects.all().order_by('-id')
+    
+    # Aplicar búsqueda si existe
+    query = request.GET.get('q')
+    if query:
+        usuarios_list = usuarios_list.filter(
+            Q(nombres__icontains=query) | 
+            Q(user__email__icontains=query) |
+            Q(documento__icontains=query)
+        )
+    
+    # Separar por roles
+    admins = usuarios_list.filter(rol='admin')
+    clientes = usuarios_list.filter(rol='cliente')
+    conductores = usuarios_list.filter(rol='conductor')
+    
+    context = {
+        "admins": admins,
+        "clientes": clientes,
+        "conductores": conductores,
+        "query": query
+    }
+        
+    return render(request, "dashboard/usuarios_lista.html", context)
 
 
 @login_required
 def eliminar_usuario(request, id):
     usuario_obj = get_object_or_404(Usuario, id=id) 
     usuario_obj.delete()
+    messages.success(request, "Usuario eliminado correctamente.")
     return redirect("usuarios:lista_usuarios")
 
 
@@ -290,10 +372,16 @@ def eliminar_usuario(request, id):
 def editar_usuario(request, id):
     usuario = get_object_or_404(Usuario, id=id)
     if request.method == "POST":
-        usuario.nombre = request.POST.get("nombre")
+        usuario.nombres = request.POST.get("nombres")
+        usuario.apellidos = request.POST.get("apellidos")
         usuario.telefono = request.POST.get("telefono")
-        usuario.rol = request.POST.get("rol")
+        
+        # Solo el administrador puede cambiar el rol (HU-05)
+        if request.user.usuario.rol == "admin":
+            usuario.rol = request.POST.get("rol")
+            
         usuario.save()
+        messages.success(request, "Cambios guardados exitosamente.")
         return redirect("usuarios:lista_usuarios")
     return render(request, "dashboard/editar_usuario.html", {
         "usuario": usuario
@@ -317,9 +405,16 @@ def perfil_conductor(request):
         conductor = request.user.usuario
         
     pedidos = Orden.objects.filter(conductor=conductor)
+    
+    # Obtener el último vehículo asignado a través de Entrega
+    from apps.ordenes.models import Entrega
+    ultima_entrega = Entrega.objects.filter(conductor=conductor).order_by('-fecha').first()
+    vehiculo = ultima_entrega.vehiculo if ultima_entrega else None
+
     return render(request, "usuarios/perfil-conductor.html", {
         "conductor": conductor,
-        "pedidos": pedidos
+        "pedidos": pedidos,
+        "vehiculo": vehiculo
     })
 
 
@@ -373,26 +468,29 @@ def api_materiales(request):
 def crear_material(request):
     if request.method == "POST":
         nombre = request.POST.get("nombre")
-        descripcion = request.POST.get("descripcion")
         tipo = request.POST.get("tipo")
+        descripcion = request.POST.get("descripcion")
         precio = request.POST.get("precio")
         stock = request.POST.get("stock")
 
-        Material.objects.create(
-            nombre=nombre,
-            descripcion=descripcion,
-            tipo=tipo,
-            precio=precio,
-            stock=stock
-        )
-        
-        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-            return JsonResponse({"status": "success", "message": "Material creado correctamente"})
-            
-        messages.success(request, "Material creado correctamente")
-        return redirect("usuarios:materiales_lista")
-    
-    return render(request, "dashboard/material_crear.html")
+        try:
+            Material.objects.create(
+                nombre=nombre,
+                tipo=tipo,
+                descripcion=descripcion,
+                precio=precio,
+                stock=stock
+            )
+            messages.success(request, "Material creado correctamente.")
+            return redirect("usuarios:materiales_lista")
+        except Exception as e:
+            messages.error(request, f"Error al crear material: {e}")
+            return render(request, "dashboard/material_form.html", {
+                "error": str(e),
+                "material": request.POST
+            })
+
+    return render(request, "dashboard/material_form.html")
 
 
 @login_required
@@ -407,7 +505,8 @@ def editar_material(request, id):
         material.save()
         
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-            return JsonResponse({"status": "success", "message": "Material actualizado"})
+            messages.success(request, "Material actualizado correctamente.")
+            return JsonResponse({"status": "success"})
             
         messages.success(request, "Material actualizado")
         return redirect("usuarios:materiales_lista")
@@ -428,9 +527,8 @@ def editar_material(request, id):
 @login_required
 def eliminar_material(request, id):
     material = get_object_or_404(Material, id=id)
-    if request.method == "POST":
-        material.delete()
-        messages.success(request, "Material eliminado correctamente")
+    material.delete()
+    messages.success(request, "Material eliminado correctamente")
     return redirect("usuarios:materiales_lista")
 
 
@@ -467,40 +565,78 @@ def crear_pedido(request):
     materiales = Material.objects.all()
 
     if request.method == "POST":
-        material_id = request.POST.get("material")
-        cantidad_str = request.POST.get("cantidad")
+        materiales_ids = request.POST.getlist('material_id[]')
+        cantidades = request.POST.getlist('cantidad[]')
         direccion = request.POST.get("direccion")
 
-        if not material_id or not cantidad_str or not direccion:
-            return render(request, "cliente/crear_pedido.html", {
+        if not materiales_ids or not direccion:
+            return render(request, "clientes/crear_pedido.html", {
                 "materiales": materiales,
-                "error": "Por favor, completa todos los campos."
+                "error": "Por favor, agrega al menos un material y la dirección."
             })
 
         try:
-            material = get_object_or_404(Material, id=material_id)
-            cantidad = int(cantidad_str)
-            total = material.precio * cantidad
+            from apps.ordenes.models import DetalleOrden
+            from django.db import transaction
 
-            nueva_orden = Orden.objects.create(
-                cliente=cliente,
-                material=material,
-                cantidad=cantidad,
-                direccion_origen="Bodega Central",
-                direccion_destino=direccion,
-                precio=total,
-                estado="pendiente"
-            )
-            
+            total_general = 0
+            detalles_pendientes = []
+
+            with transaction.atomic():
+                # 1. Crear la Orden principal
+                nueva_orden = Orden.objects.create(
+                    cliente=cliente,
+                    direccion_origen="Bodega Central",
+                    direccion_destino=direccion,
+                    estado="pendiente"
+                )
+
+                # 2. Procesar cada material
+                for m_id, cant in zip(materiales_ids, cantidades):
+                    material = get_object_or_404(Material, id=m_id)
+                    cantidad = int(cant)
+
+                    if cantidad <= 0:
+                        raise ValueError(f"La cantidad para {material.nombre} debe ser mayor a 0.")
+
+                    if material.stock < cantidad:
+                        raise ValueError(f"Stock insuficiente para {material.nombre}. Quedan {material.stock}.")
+
+                    precio_unitario = material.precio
+                    total_item = precio_unitario * cantidad
+                    total_general += total_item
+
+                    # Crear el detalle
+                    DetalleOrden.objects.create(
+                        orden=nueva_orden,
+                        material=material,
+                        cantidad=cantidad,
+                        precio_unitario=precio_unitario
+                    )
+                    
+                    # Descontar stock
+                    material.stock -= cantidad
+                    material.save()
+
+                # 3. Actualizar el total de la orden
+                nueva_orden.precio = total_general
+                nueva_orden.save()
+
+            messages.success(request, f"Pedido #{nueva_orden.id} creado correctamente.")
             return redirect("usuarios:mis_pedidos")
 
+        except ValueError as e:
+            return render(request, "clientes/crear_pedido.html", {
+                "materiales": materiales,
+                "error": str(e)
+            })
         except Exception as e:
-            return render(request, "cliente/crear_pedido.html", {
+            return render(request, "clientes/crear_pedido.html", {
                 "materiales": materiales,
                 "error": f"Error interno: {e}"
             })
 
-    return render(request, "cliente/crear_pedido.html", {
+    return render(request, "clientes/crear_pedido.html", {
         "materiales": materiales
     })
 
@@ -509,6 +645,20 @@ def crear_pedido(request):
 @login_required
 def lista_pedidos_admin(request):
     pedidos = Orden.objects.all().order_by("-fecha")
+    
+    # Aplicar filtros si existen
+    cliente_query = request.GET.get('cliente')
+    fecha_query = request.GET.get('fecha')
+    
+    if cliente_query:
+        pedidos = pedidos.filter(
+            Q(cliente__nombres__icontains=cliente_query) |
+            Q(cliente__apellidos__icontains=cliente_query)
+        )
+    
+    if fecha_query:
+        pedidos = pedidos.filter(fecha__date=fecha_query)
+        
     return render(request, "dashboard/pedidos_lista.html", {
         "pedidos": pedidos
     })
@@ -525,8 +675,54 @@ def ver_pedido_admin(request, id):
 @login_required
 def eliminar_orden(request, id):
     orden = get_object_or_404(Orden, id=id)
-    orden.delete()
-    return redirect("ordenes:lista_ordenes")
+    # No se elimina permanentemente, se marca como cancelado
+    orden.estado = "cancelado"
+    orden.save()
+    messages.warning(request, f"Pedido #{orden.id} ha sido cancelado.")
+    
+    if request.user.usuario.rol == "admin":
+        return redirect("usuarios:lista_pedidos_admin")
+    return redirect("usuarios:mis_pedidos")
+
+
+@login_required
+def editar_pedido(request, id):
+    orden = get_object_or_404(Orden, id=id)
+    materiales = Material.objects.all()
+    
+    if request.method == "POST":
+        material_id = request.POST.get("material")
+        cantidad = int(request.POST.get("cantidad"))
+        direccion = request.POST.get("direccion")
+        
+        material = get_object_or_404(Material, id=material_id)
+        
+        orden.material = material
+        orden.cantidad = cantidad
+        orden.direccion_destino = direccion
+        orden.precio = material.precio * cantidad
+        orden.save()
+        
+        messages.success(request, f"Pedido #{orden.id} actualizado correctamente.")
+        return redirect("usuarios:mis_pedidos")
+        
+    return render(request, "clientes/editar_pedido.html", {
+        "orden": orden,
+        "materiales": materiales
+    })
+
+
+# ---------------- PASSWORD RESET ----------------
+class CustomPasswordResetView(auth_views.PasswordResetView):
+    pass
+
+
+@login_required
+def pedido_detalle(request, id):
+    orden = get_object_or_404(Orden, id=id)
+    return render(request, "dashboard/pedido_detalle.html", {
+        "orden": orden
+    })
 
 
 # ---------------- LOGOUT ----------------

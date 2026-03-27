@@ -1,118 +1,344 @@
-/* Estilos para las tablas y contenedores del Dashboard */
-.table-container {
-    background: white;
-    border-radius: 15px;
-    overflow: hidden;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+/* Estilos globales para Dashboard con paleta premium */
+.table {
+    color: #f4f4f5 !important;
+    margin-bottom: 0;
+    background-color: transparent !important;
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
 }
 
 .table thead {
-    background-color: #f8f9fa;
-    border-bottom: 2px solid #eef2f7;
+    background-color: rgba(255,255,255,0.05) !important;
 }
 
 .table th {
-    font-weight: 600;
+    font-weight: 800 !important;
     text-transform: uppercase;
-    font-size: 0.8rem;
-    letter-spacing: 0.5px;
-    color: #747d8c;
-    padding: 15px;
+    font-size: 0.8rem !important;
+    letter-spacing: 1px;
+    color: var(--color-accent) !important;
+    padding: 22px 15px !important;
+    border: none !important;
+    background-color: transparent !important;
+}
+
+.table tbody tr {
+    background-color: #111111 !important; /* Fondo oscuro sólido */
 }
 
 .table td {
+    padding: 20px 15px !important;
+    vertical-align: middle !important;
+    color: #f4f4f5 !important; 
+    border-bottom: 1px solid var(--color-border) !important;
+    font-size: 0.95rem !important;
+    background-color: #111111 !important; /* Forzar fondo en la celda */
+}
+
+.table-hover tbody tr:hover td {
+    background-color: rgba(255,255,255,0.05) !important;
+    color: #ffffff !important;
+}
+
+/* Forzar que el fondo del contenedor sea sólido */
+.table-container {
+    background: #0a0a0a !important; 
+    border-radius: 28px;
+    overflow: hidden;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+    border: 1px solid var(--color-border);
     padding: 15px;
-    vertical-align: middle;
-    color: #2f3542;
+    margin-bottom: 30px;
+}
+
+/* Mensajes de 'No hay registros' */
+.table td[colspan] {
+    text-align: center;
+    padding: 60px 20px !important;
+    color: #cbd5e1 !important; /* Brighter gray for messages */
+    font-style: italic;
+    background-color: #111111 !important;
+    border: none !important;
+}
+
+/* Estilo para DataTables */
+.dataTables_wrapper .dataTables_length label,
+.dataTables_wrapper .dataTables_filter label,
+.dataTables_wrapper .dataTables_info,
+.dataTables_wrapper .dataTables_empty {
+    color: #f8fafc !important;
+    font-weight: 600;
+}
+
+.dataTables_wrapper .dataTables_filter input {
+    background-color: rgba(255,255,255,0.05) !important;
+    border: 1px solid var(--color-border) !important;
+    color: white !important;
+    border-radius: 12px;
+    padding: 8px 15px;
+}
+
+/* Formularios de Pedido y Creación */
+.form-control, .form-select {
+    background: #1a1a1a !important; /* Fondo oscuro sólido */
+    border: 1.5px solid var(--color-border) !important;
+    border-radius: 15px !important;
+    color: #ffffff !important;
+    padding: 14px 20px !important;
+    font-weight: 500;
+}
+
+/* Forzar color de fondo de las opciones del select */
+.form-select option {
+    background-color: #1a1a1a !important;
+    color: #ffffff !important;
+}
+
+.form-control::placeholder {
+    color: #64748b !important;
+    opacity: 0.8;
+}
+
+.form-control:focus {
+    background: rgba(255,255,255,0.08) !important;
+    border-color: var(--color-accent) !important;
+    box-shadow: 0 0 0 4px rgba(202, 160, 48, 0.15) !important;
+}
+
+/* Labels de formularios en páginas de creación */
+.form-label, label {
+    color: #ffffff !important; /* Blanco puro */
+    font-weight: 700 !important;
+    margin-bottom: 12px;
+    font-size: 0.9rem;
+    display: block;
+    background: transparent !important; /* Evitar fondos blancos */
+}
+
+/* Secciones de formulario (como 1. SECCIÓN MATERIALES) */
+.text-accent.text-uppercase.small {
+    color: var(--color-accent) !important;
+    font-weight: 800 !important;
+    letter-spacing: 1.5px;
+}
+
+.table tr:last-child td {
+    border-bottom: none;
 }
 
 .desc-cell {
     max-width: 400px;
-    color: #57606f;
-    line-height: 1.5;
+    color: var(--color-muted);
+    line-height: 1.6;
     font-size: 0.9rem;
 }
 
 .badge-tipo {
-    background-color: #e3f2fd;
-    color: #1976d2;
-    padding: 5px 12px;
-    border-radius: 20px;
-    font-weight: 500;
-    font-size: 0.85rem;
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    color: var(--color-accent) !important;
+    padding: 8px 16px !important;
+    border-radius: 100px !important;
+    font-weight: 800 !important;
+    font-size: 0.75rem !important;
+    border: 1.5px solid var(--color-accent) !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    display: inline-block !important;
 }
 
 .price-tag {
-    font-weight: 700;
-    color: #2ed573;
-    white-space: nowrap;
-    display: inline-block;
-    width: 100%;
-    text-align: center;
+    font-weight: 800;
+    color: #22c55e;
+    font-size: 1rem;
 }
 
 .stock-tag {
-    font-weight: 600;
-    color: #ffa502;
-    white-space: nowrap;
-    display: inline-block;
-    width: 100%;
-    text-align: center;
+    font-weight: 700;
+    color: var(--color-accent);
 }
 
-/* Centrado de formularios en páginas */
-.form-container-centered {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 70vh;
+/* Tarjetas informativas (Stats) */
+.stat-card h6 {
+    color: #f8fafc !important; /* Blanco casi puro para títulos de tarjetas */
+    font-weight: 800 !important;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 1.2px;
+    opacity: 0.9;
 }
 
+.stat-card h2 {
+    color: #ffffff !important;
+    font-weight: 900;
+    margin-top: 10px;
+}
+
+.text-muted {
+    color: #cbd5e1 !important; /* Gris azulado muy claro para textos secundarios */
+}
+
+/* DataTables styling for visibility */
+.dataTables_wrapper .dataTables_length, 
+.dataTables_wrapper .dataTables_filter, 
+.dataTables_wrapper .dataTables_info, 
+.dataTables_wrapper .dataTables_processing, 
+.dataTables_wrapper .dataTables_paginate {
+    color: #d1d1d6 !important;
+    margin: 15px 0;
+}
+
+.dataTables_wrapper .dataTables_filter input, 
+.dataTables_wrapper .dataTables_length select {
+    background-color: rgba(255,255,255,0.05) !important;
+    border: 1px solid var(--color-border) !important;
+    color: white !important;
+    border-radius: 8px;
+    padding: 4px 10px;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+    color: #d1d1d6 !important;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.current {
+    background: var(--color-accent) !important;
+    color: #000 !important;
+    border: none !important;
+    border-radius: 8px;
+}
+
+.stat-card {
+    background: var(--color-surface);
+    border-radius: 24px;
+    padding: 24px;
+    border: 1px solid var(--color-border);
+    transition: var(--transition);
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--color-accent);
+}
+
+/* Formularios */
 .card-form {
-    width: 100%;
-    max-width: 500px;
-    border-radius: 15px;
+    background: var(--color-surface);
+    border-radius: 32px;
+    border: 1px solid var(--color-border);
+    padding: 20px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+}
+
+.form-label {
+    color: var(--color-text);
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.form-control, .form-select {
+    background: rgba(255,255,255,0.03) !important;
+    border: 2px solid var(--color-border) !important;
+    border-radius: 15px !important;
+    color: white !important;
+    padding: 12px 20px !important;
+}
+
+.form-control:focus {
+    border-color: var(--color-accent) !important;
+    box-shadow: 0 0 0 4px rgba(202, 160, 48, 0.1) !important;
+}
+
+/* Botones */
+.btn-primary {
+    background: var(--color-primary);
     border: none;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    border-radius: 100px;
+    padding: 10px 24px;
+    font-weight: 700;
+}
+
+.btn-primary:hover {
+    background: #800000;
+    transform: scale(1.02);
+}
+
+.btn-gold {
+    background: var(--color-accent);
+    color: #000;
+    border: none;
+    border-radius: 100px;
+    padding: 10px 24px;
+    font-weight: 800;
 }
 
 .btn-action {
-    width: 35px;
-    height: 35px;
-    padding: 0;
+    background: rgba(255,255,255,0.08) !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    color: var(--color-accent) !important; /* Íconos en dorado para resaltar */
+    border-radius: 12px;
+    width: 42px;
+    height: 42px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    border-radius: 10px;
-    transition: all 0.3s;
+    transition: all 0.3s ease;
+    text-decoration: none !important;
 }
 
 .btn-action:hover {
-    transform: translateY(-2px);
+    background: var(--color-accent) !important;
+    color: #000 !important;
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(202, 160, 48, 0.3);
 }
 
-/* Estilos para Modales */
+.btn-action i {
+    font-size: 1.1rem;
+}
+
+/* Estilos para Modales - Fondo blanco y letra negra para legibilidad */
 .modal-content {
-    border-radius: 20px;
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    border-radius: 24px;
     border: none;
-    box-shadow: 0 15px 50px rgba(0,0,0,0.2);
 }
 
 .modal-header {
-    border-bottom: 1px solid #f1f2f6;
-    padding: 20px 30px;
+    border-bottom: 1px solid #f1f1f1;
 }
 
 .modal-title {
-    font-weight: 700;
-    color: #2f3542;
+    color: #000000 !important;
+    font-weight: 800;
 }
 
-.modal-body {
-    padding: 30px;
+.modal-body label {
+    color: #333333 !important;
+}
+
+.modal-body .form-control, .modal-body .form-select {
+    background-color: #f8f9fa !important;
+    border: 1px solid #dee2e6 !important;
+    color: #000000 !important;
+}
+
+.modal-body .form-control:focus {
+    border-color: var(--color-accent) !important;
+    box-shadow: 0 0 0 0.25rem rgba(202, 160, 48, 0.25) !important;
 }
 
 .modal-footer {
-    border-top: 1px solid #f1f2f6;
-    padding: 20px 30px;
+    border-top: 1px solid #f1f1f1;
 }
+
+/* Ajustes adicionales de legibilidad en Tablas */
+.table td {
+    font-weight: 500;
+}
+
+.table th {
+    color: var(--color-accent);
+}
+
+

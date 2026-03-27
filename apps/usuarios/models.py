@@ -34,7 +34,8 @@ class Usuario(models.Model):
 
     rol = models.CharField(max_length=20, choices=ROLES)
 
-    nombre = models.CharField(max_length=100)
+    nombres = models.CharField(max_length=100, default="")
+    apellidos = models.CharField(max_length=100, default="")
     telefono = models.CharField(max_length=20, blank=True)
 
     tipo_documento = models.CharField(
@@ -51,7 +52,26 @@ class Usuario(models.Model):
     )
 
     def __str__(self):
-        return self.nombre
+        return f"{self.nombres} {self.apellidos}"
+
+class Administrador(Usuario):
+    class Meta:
+        proxy = True
+        verbose_name = 'Administrador'
+        verbose_name_plural = 'Administradores'
+
+class Conductor(Usuario):
+    class Meta:
+        proxy = True
+        verbose_name = 'Conductor'
+        verbose_name_plural = 'Conductores'
+
+class Cliente(Usuario):
+    class Meta:
+        proxy = True
+        verbose_name = 'Cliente'
+        verbose_name_plural = 'Clientes'
+
 
 
 # -------------------------

@@ -1,69 +1,72 @@
+{% extends "usuarios/panel-sesion.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="es">
 
-<head>
-    <meta charset="UTF-8">
-    <link rel="shortcut icon" href="{% static 'img/Logo1.jpeg' %}" type="image/x-icon">
-    <link rel="stylesheet" href="{% static 'css/registroestilo.css' %}">
-</head>
+{% block title %}Crear Cuenta - Constru-trans{% endblock %}
 
-<body>
-
-<div class="card">
-
-<img src="{% static 'img/Logo1.jpeg' %}" width="200" style="display:block;margin:auto;margin-bottom:10px;">
-
-<h2>Crear Cuenta</h2>
-
-{% if error %}
-<p style="color:red;text-align:center">{{ error }}</p>
-{% endif %}
-
-<form method="POST">
-
-{% csrf_token %}
-
-<input type="text" name="nombre" placeholder="Nombre completo" required>
-
-<input type="text" name="usuario" placeholder="Nombre de usuario" required>
-
-<input type="email" name="correo" placeholder="Correo electrónico" required>
-
-<input type="text" name="telefono" placeholder="Teléfono">
-
-<select name="tipo_documento" required>
-<option value="">Tipo de documento</option>
-<option value="CC">Cédula de Ciudadanía</option>
-<option value="CE">Cédula de Extranjería</option>
-<option value="PA">Pasaporte</option>
-<option value="PEP">Permiso Especial de Permanencia</option>
-<option value="PPT">Permiso por Protección Temporal</option>
-<option value="NIT">NIT</option>
-</select>
-
-<input type="text" name="documento" placeholder="Número de documento" required>
-
-<select name="rol" required>
-<option value="">Seleccionar tipo de usuario</option>
-<option value="cliente">Cliente</option>
-<option value="conductor">Conductor</option>
-</select>
-
-<input type="password" name="contrasena" placeholder="Contraseña" required>
-
-<input type="password" name="confirmar_contrasena" placeholder="Confirmar contraseña" required>
-
-<button type="submit">Registrarse</button>
-
-</form>
-
-<div class="links">
-<p>¿Ya tienes cuenta? 
-    <a href="{% url 'usuarios:login' %}">Inicia sesión</a>
-</p>
-
+{% block content %}
+<div class="animate-up">
+    <h1 class="welcome-h1">REGÍSTRATE</h1>
+    <p class="welcome-p">¿Ya tienes una cuenta? <a href="{% url 'usuarios:login' %}">Inicia sesión</a></p>
 </div>
 
-</body>
-</html>
+{% if error %}
+    <div class="alert-custom animate__animated animate__shakeX">
+        <i class="bi bi-exclamation-circle-fill me-2"></i> {{ error }}
+    </div>
+{% endif %}
+
+<form method="POST" class="animate-up delay-1">
+    {% csrf_token %}
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-6">
+            <label class="label-custom">Nombres</label>
+            <input type="text" name="nombres" class="input-custom" placeholder="Juan" required>
+        </div>
+        <div class="col-md-6">
+            <label class="label-custom">Apellidos</label>
+            <input type="text" name="apellidos" class="input-custom" placeholder="Pérez" required>
+        </div>
+    </div>
+
+    <div class="form-group-custom">
+        <label class="label-custom">Correo Electrónico</label>
+        <input type="email" name="correo" class="input-custom" placeholder="ejemplo@correo.com" required>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <label class="label-custom">Tipo</label>
+            <select name="tipo_documento" class="input-custom form-select" style="background-image: none;" required>
+                <option value="CC">C.C.</option>
+                <option value="CE">C.E.</option>
+                <option value="NIT">NIT</option>
+            </select>
+        </div>
+        <div class="col-md-8">
+            <label class="label-custom">Documento</label>
+            <input type="text" name="documento" class="input-custom" placeholder="12345678" required>
+        </div>
+    </div>
+
+    <div class="form-group-custom">
+        <label class="label-custom">Teléfono</label>
+        <input type="text" name="telefono" class="input-custom" placeholder="3001234567" required>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-6">
+            <label class="label-custom">Contraseña</label>
+            <input type="password" name="contrasena" class="input-custom" placeholder="••••••••" required>
+        </div>
+        <div class="col-md-6">
+            <label class="label-custom">Confirmar</label>
+            <input type="password" name="confirmar_contrasena" class="input-custom" placeholder="••••••••" required>
+        </div>
+    </div>
+
+    <button type="submit" class="btn-main">
+        Crear Cuenta
+    </button>
+</form>
+{% endblock %}

@@ -1,56 +1,68 @@
+{% extends "usuarios/panel-sesion.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="es">
 
-<head>
-<meta charset="UTF-8">
-<link rel="shortcut icon" href="{% static 'img/Logo1.jpeg' %}" type="image/x-icon">
-<title>Iniciar sesión</title>
+{% block title %}Iniciar Sesión - Constru-trans{% endblock %}
 
-<link rel="stylesheet" href="{% static 'css/loginestilos.css' %}">
-
-</head>
-
-<body>
-
-<div class="card">
-
-<img src="{% static 'img/Logo1.jpeg' %}" width="200" style="display:block;margin:auto;margin-bottom:10px;">
-
-<h2>Iniciar sesión</h2>
+{% block content %}
+<div class="animate-up">
+    <h1 class="welcome-h1">¡BIENVENIDO!</h1>
+    <p class="welcome-p">¿No tienes una cuenta? <a href="{% url 'usuarios:registro' %}">Regístrate</a></p>
+</div>
 
 {% if error %}
-<p class="error">
-{{ error }}
-</p>
+    <div class="alert-custom animate__animated animate__shakeX">
+        <i class="bi bi-exclamation-circle-fill me-2"></i> {{ error }}
+    </div>
 {% endif %}
 
-<form method="POST">
+<form method="POST" class="animate-up delay-1">
+    {% csrf_token %}
 
-{% csrf_token %}
+    <div class="form-group-custom">
+        <label class="label-custom">Usuario o Correo</label>
+        <input type="text" name="username" class="input-custom" 
+               placeholder="ejemplo@correo.com" required autofocus>
+    </div>
 
-<input type="text" name="username" placeholder="Usuario o Correo" required>
+    <div class="form-group-custom">
+        <label class="label-custom">Contraseña</label>
+        <div class="position-relative">
+            <input type="password" name="password" id="password" class="input-custom" 
+                   placeholder="••••••••" required>
+            <button type="button" onclick="togglePassword()" class="btn position-absolute top-50 end-0 translate-middle-y border-0 text-muted pe-4" style="background: transparent;">
+                <i class="bi bi-eye-slash" id="toggleIcon"></i>
+            </button>
+        </div>
+    </div>
 
-<input type="password" name="password" placeholder="Contraseña" required>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="rememberMe" style="background-color: transparent; border-color: var(--input-border);">
+            <label class="form-check-label small text-muted fw-semibold" for="rememberMe">
+                Recuérdame
+            </label>
+        </div>
+        <a href="{% url 'usuarios:password_reset' %}" class="text-decoration-none small fw-bold" style="color: var(--primary-gold);">
+            ¿Olvidaste tu contraseña?
+        </a>
+    </div>
 
-<button type="submit">Ingresar</button>
-
+    <button type="submit" class="btn-main d-flex align-items-center justify-content-center">
+        <i class="bi bi-file-earmark-text me-2"></i> Iniciar Sesión
+    </button>
 </form>
 
-<div class="links">
-
-<a href="{% url 'usuarios:password_reset' %}">
-¿Olvidaste tu contraseña?
-</a>
-
-<p>
-¿No tienes cuenta?  
-<a href="{% url 'usuarios:registro' %}">Regístrate</a>
-</p>
-
-</div>
-
-</div>
-
-</body>
-</html>
+<script>
+function togglePassword() {
+    const passwordInput = document.getElementById('password');
+    const toggleIcon = document.getElementById('toggleIcon');
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        toggleIcon.classList.replace('bi-eye-slash', 'bi-eye');
+    } else {
+        passwordInput.type = 'password';
+        toggleIcon.classList.replace('bi-eye', 'bi-eye-slash');
+    }
+}
+</script>
+{% endblock %}

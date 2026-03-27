@@ -1,63 +1,171 @@
-{% extends "Cliente/base_cliente.html" %}
+{% extends "base.html" %}
+
+{% block title %}Solicitar Pedido - Constru-trans{% endblock %}
+
+{% block header_title %}Nueva Solicitud de Servicio{% endblock %}
 
 {% block content %}
 
-<div class="form-container-centered">
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="table-container p-4 p-md-5">
+            <div class="text-center mb-5">
+                <i class="bi bi-cart-plus text-accent fs-1 mb-3 d-block"></i>
+                <h3 class="fw-800 text-white mb-2">Detalles del Pedido</h3>
+                <p class="text-muted">Completa la información para procesar tu entrega de materiales.</p>
+            </div>
 
-<div class="card card-form p-4">
+            {% if error %}
+                <div class="alert alert-danger rounded-4 px-4 mb-4 border-0 shadow-sm" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ error }}
+                </div>
+            {% endif %}
 
-<h2 class="text-center mb-4">Solicitar Servicio</h2>
+            <form method="POST" id="form-pedido">
+                {% csrf_token %}
 
-<form method="POST">
+                <!-- SECCIÓN AGREGAR MATERIALES -->
+                <div class="mb-5 p-4 rounded-4" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);">
+                    <label class="form-label fw-800 text-accent text-uppercase small mb-3" style="letter-spacing: 1px;">1. Selección de Materiales</label>
+                    <div class="row g-3">
+                        <div class="col-md-7">
+                            <select id="select-material" class="form-select rounded-pill border-0 px-4 py-2">
+                                <option value="" data-precio="0">Seleccione un material...</option>
+                                {% for m in materiales %}
+                                    <option value="{{ m.id }}" data-precio="{{ m.precio }}">{{ m.nombre }} - ${{ m.precio }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <input type="number" id="input-cantidad" class="form-control rounded-pill border-0 px-4 py-2" placeholder="Cant." min="1" value="1">
+                        </div>
+                        <div class="col-md-2">
+                            <button type="button" class="btn btn-gold rounded-pill w-100 py-2 h-100" onclick="agregarMaterial()">
+                                <i class="bi bi-plus-lg"></i>
+                            </button>
+                        </div>
+                    </div>
 
-{% csrf_token %}
+                    <!-- TABLA DE MATERIALES AGREGADOS -->
+                    <div class="table-responsive mt-4">
+                        <table class="table table-hover align-middle no-datatable" id="tabla-materiales">
+                            <thead>
+                                <tr class="text-muted small border-bottom border-secondary">
+                                    <th class="ps-0">Material</th>
+                                    <th class="text-center">Cant.</th>
+                                    <th class="text-end">Subtotal</th>
+                                    <th class="text-end pe-0"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="lista-detalles">
+                                <!-- Aquí se agregarán los materiales dinámicamente -->
+                            </tbody>
+                        </table>
+                    </div>
 
-<div class="mb-3">
-    <label class="form-label">Material</label>
-    <select name="material" class="form-select rounded-pill" required>
-        <option value="">Seleccione un material</option>
-        {% for m in materiales %}
-            <option value="{{ m.id }}">
-                {{ m.nombre }} - ${{ m.precio }}
-            </option>
-        {% endfor %}
-    </select>
-</div>
+                    <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top border-secondary">
+                        <span class="fw-700 text-muted">Total Estimado:</span>
+                        <h3 class="mb-0 fw-900 text-accent" id="display-total">$ 0</h3>
+                    </div>
+                </div>
 
-<div class="mb-3">
-    <label class="form-label">Cantidad</label>
-    <input type="number" name="cantidad" class="form-control rounded-pill" placeholder="Cantidad de material" required>
-</div>
+                <!-- DETALLES DE ENTREGA -->
+                <div class="mb-5 p-4 rounded-4" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);">
+                    <label class="form-label fw-800 text-accent text-uppercase small mb-3" style="letter-spacing: 1px;">2. Detalles de Entrega</label>
+                    <div class="row g-4">
+                        <div class="col-md-12">
+                            <label class="form-label text-muted small px-3 mb-1">Dirección de destino</label>
+                            <input type="text" name="direccion" class="form-control rounded-pill border-0 px-4 py-2" placeholder="Ej: Calle Principal #123, Barrio Norte" required>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label text-muted small px-3 mb-1">Fecha y Hora Programada</label>
+                            <input type="datetime-local" name="fecha_entrega" class="form-control rounded-pill border-0 px-4 py-2" required>
+                        </div>
+                    </div>
+                </div>
 
-<div class="mb-3">
-    <label class="form-label">Dirección de entrega</label>
-    <input type="text" name="direccion" class="form-control rounded-pill" placeholder="Dirección exacta" required>
-</div>
-
-<div class="mb-3">
-    <label class="form-label">Fecha y Hora Programada de Entrega</label>
-    <input type="datetime-local" name="fecha_entrega" class="form-control rounded-pill" required>
-</div>
-
-{% if error %}
-    <div class="alert alert-danger py-2 mb-3 small">
-        <i class="bi bi-exclamation-triangle me-2"></i> {{ error }}
+                <div class="d-grid gap-3 mt-4">
+                    <button type="submit" class="btn btn-gold rounded-pill py-3 fw-800 shadow-sm">
+                        <i class="bi bi-check2-circle me-2"></i> Confirmar y Enviar Pedido
+                    </button>
+                    <a href="{% url 'usuarios:panel' %}" class="btn btn-outline-light rounded-pill py-2">
+                        Cancelar Solicitud
+                    </a>
+                </div>
+            </form>
+        </div>
     </div>
-{% endif %}
-
-<div class="d-grid gap-2 mt-4">
-    <button type="submit" class="btn btn-primary rounded-pill">
-        <i class="bi bi-check-lg me-2"></i> Crear Pedido
-    </button>
-    <a href="{% url 'usuarios:panel_cliente' %}" class="btn btn-light rounded-pill">
-        Volver
-    </a>
 </div>
 
-</form>
+<script>
+let totalGeneral = 0;
 
-</div>
+function agregarMaterial() {
+    const select = document.getElementById('select-material');
+    const cantidadInput = document.getElementById('input-cantidad');
+    const lista = document.getElementById('lista-detalles');
+    
+    const materialId = select.value;
+    const materialNombre = select.options[select.selectedIndex].text.split(' - ')[0];
+    const precio = parseFloat(select.options[select.selectedIndex].getAttribute('data-precio')) || 0;
+    const cantidad = parseInt(cantidadInput.value) || 0;
 
-</div>
+    if (!materialId || cantidad <= 0) {
+        return;
+    }
+
+    const subtotal = precio * cantidad;
+    totalGeneral += subtotal;
+
+    const row = document.createElement('tr');
+    row.className = "border-bottom border-secondary-subtle";
+    row.innerHTML = `
+        <input type="hidden" name="material_id[]" value="${materialId}">
+        <input type="hidden" name="cantidad[]" value="${cantidad}">
+        <td class="ps-0 text-white fw-600">${materialNombre}</td>
+        <td class="text-center text-muted">${cantidad}</td>
+        <td class="text-end text-accent fw-700">$ ${subtotal.toLocaleString()}</td>
+        <td class="text-end pe-0">
+            <button type="button" class="btn btn-link btn-sm text-danger p-0" onclick="eliminarFila(this, ${subtotal})">
+                <i class="bi bi-trash3-fill"></i>
+            </button>
+        </td>
+    `;
+    lista.appendChild(row);
+    actualizarDisplay();
+    
+    // Resetear inputs
+    select.value = "";
+    cantidadInput.value = 1;
+}
+
+function eliminarFila(btn, subtotal) {
+    btn.closest('tr').remove();
+    totalGeneral -= subtotal;
+    actualizarDisplay();
+}
+
+function actualizarDisplay() {
+    document.getElementById('display-total').innerText = '$ ' + totalGeneral.toLocaleString();
+}
+</script>
+
+<style>
+    .fw-900 { font-weight: 900; }
+    .fw-800 { font-weight: 800; }
+    .fw-700 { font-weight: 700; }
+    .fw-600 { font-weight: 600; }
+    .text-accent { color: var(--color-accent) !important; }
+    .btn-gold {
+        background-color: var(--color-accent);
+        border-color: var(--color-accent);
+        color: #000;
+    }
+    .btn-gold:hover {
+        background-color: #b38d2a;
+        border-color: #b38d2a;
+        color: #000;
+    }
+</style>
 
 {% endblock %}

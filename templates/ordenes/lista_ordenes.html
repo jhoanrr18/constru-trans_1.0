@@ -18,8 +18,8 @@
 
 <tr>
     <td>{{ orden.id }}</td>
-    <td>{{ orden.cliente.nombre }}</td>
-    <td>{{ orden.conductor.nombre }}</td>
+    <td>{{ orden.cliente }}</td>
+    <td>{{ orden.conductor }}</td>
     <td>{{ orden.direccion_origen }}</td>
     <td>{{ orden.direccion_destino }}</td><td>
     {% if orden.estado == "pendiente" %}
