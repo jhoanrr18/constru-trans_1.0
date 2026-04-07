@@ -1,0 +1,60 @@
+from django.db import models
+from usuarios.models import Usuario, Vehiculo
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
+
+class Orden(models.Model):
+    cliente = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name="ordenes_cliente")
+    conductor = models.ForeignKey(Usuario, on_delete=models.SET_NULL, null=True, blank=True, related_name="ordenes_conductor")
+
+    direccion_origen = models.CharField(max_length=200)
+    direccion_destino = models.CharField(max_length=200)
+
+    fecha = models.DateTimeField(auto_now_add=True)
+
+    estado = models.CharField(
+        max_length=20,
+        choices=[
+            ("pendiente", "Pendiente"),
+            ("en_ruta", "En Ruta"),
+            ("entregado", "Entregado"),
+        ],
+        default="pendiente"
+    )
+
+    precio = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+
+    def __str__(self):
+        return f"Orden {self.id} - {self.estado}"
+
+
+class Entrega(models.Model):
+    pedido = models.ForeignKey(Orden, on_delete=models.CASCADE)
+    conductor = models.ForeignKey(Usuario, on_delete=models.CASCADE)
+    vehiculo = models.ForeignKey(Vehiculo, on_delete=models.CASCADE)
+
+    fecha = models.DateTimeField(auto_now_add=True)
+
+    estado = models.CharField(
+        max_length=20,
+        choices=[
+            ("pendiente", "Pendiente"),
+            ("en_ruta", "En Ruta"),
+            ("entregado", "Entregado"),
+        ],
+        default="pendiente"
+    )
+
+    def __str__(self):
+        return f"Entrega de pedido {self.pedido.id}"
+
+
+@receiver(post_save, sender=Entrega)
+def actualizar_estado_orden(sender, instance, created, **kwargs):
+    if created:
+        pedido = instance.pedido
+        # Cambiar estado a EN_RUTA cuando se asigna una entrega
+        if pedido.estado == Orden.PENDIENTE:
+            pedido.estado = Orden.EN_RUTA
+            pedido.save()
