@@ -38,10 +38,11 @@ var/
 wheels/
 *.egg-info/
 
-# --- Migraciones (Recomendado para evitar el error HEAD que sufriste) ---
-# Mantenemos los __init__.py pero ignoramos los archivos numerados
-**/migrations/*.py
-!**/migrations/__init__.py
+# --- Migraciones ---
+# Las migraciones deben estar en el repositorio para que la base de datos sea consistente
+# **/migrations/*.py
+# !**/migrations/__init__.py
+**/migrations/__pycache__/
 
 # --- Archivos de Medios y Logs ---
 media/
